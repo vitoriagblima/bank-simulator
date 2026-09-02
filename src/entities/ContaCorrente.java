@@ -42,13 +42,11 @@ public final class ContaCorrente extends Conta {
 
     @Override
     public String toString() {
-        return "ContaCorrente {" +
-                "numero =" + getNumero() +
-                ", agencia =" + getAgencia() +
-                ", saldo =" + getSaldo() +
-                ", titular =" + getTitular() +
-                ", limiteEspecial =" + getLimiteEspecial() +
-                ", taxaManutencao =" + getTaxaManutencao() +
-                '}';
+        return "Conta Corrente | Número: " + getNumero() +
+                " | Agência: " + getAgencia() +
+                " | Saldo: R$ " + String.format("%.2f", getSaldo()) +
+                " | Titular: " + getTitular().getNome() +
+                " | Limite Especial: R$ " + String.format("%.2f", getLimiteEspecial()) +
+                " | Taxa Manutenção: R$ " + String.format("%.2f", getTaxaManutencao());
     }
 }
