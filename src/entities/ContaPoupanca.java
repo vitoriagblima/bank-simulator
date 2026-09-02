@@ -34,14 +34,13 @@ public final class ContaPoupanca extends Conta {
         return this.taxaRendimento;
     }
 
+    @Override
     public String toString() {
-        return "ContaPoupanca {" +
-                "numero =" + getNumero() +
-                ", agencia =" + getAgencia() +
-                ", saldo=R$ " + String.format("%.2f", getSaldo()) +
-                ", titular =" + getTitular().getNome() +
-                ", taxaRendimento =" + taxaRendimento +
-                '}';
+        return "Conta Poupança | Número: " + getNumero() +
+                " | Agência: " + getAgencia() +
+                " | Saldo: R$ " + String.format("%.2f", getSaldo()) +
+                " | Titular: " + getTitular().getNome() +
+                " | Taxa Rendimento: " + taxaRendimento;
     }
 
 }
