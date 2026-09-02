@@ -16,8 +16,7 @@ public class Banco {
     }
 
     public void adicionarConta(Conta conta) {
-        Conta novaConta = new Conta();
-        contas.add(novaConta);
+        contas.add(conta);
     }
 
     public Conta buscarConta(Integer numero) {
@@ -31,7 +30,7 @@ public class Banco {
         return null;
     }
 
-    public void ListarContas() {
+    public void listarContas() {
         for (Conta c : contas) {
             System.out.println("Número da Conta: " + c.getNumero() +
                     " | Agência: " + c.getAgencia() +
