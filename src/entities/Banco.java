@@ -32,9 +32,10 @@ public class Banco {
 
     public void listarContas() {
         for (Conta c : contas) {
-            System.out.println("Número da Conta: " + c.getNumero() +
+            System.out.println("Tipo: " + c.getClass().getSimpleName() +
+                    " | Número da Conta: " + c.getNumero() +
                     " | Agência: " + c.getAgencia() +
-                    " | Saldo: R$ " + c.getSaldo() +
+                    " | Saldo: R$ " + String.format("%.2f", c.getSaldo()) +
                     " | Cliente: " + c.getTitular().getNome());
         }
     }
