@@ -10,12 +10,14 @@ public class Transacao {
     private String descricao;
 
     public Transacao() {
+        this.dataHora = LocalDateTime.now();
     }
 
     public Transacao(Double valor, TipoTransacao tipo, String descricao) {
         this.valor = valor;
         this.tipo = tipo;
         this.descricao = descricao;
+        this.dataHora = LocalDateTime.now();
     }
 
     public LocalDateTime getDataHora() {
