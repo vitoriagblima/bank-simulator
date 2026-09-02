@@ -39,14 +39,17 @@ public class Conta {
     }
 
     public boolean transferir(Double valor, Conta destino) {
-        if (destino != null && valor != null && valor > 0 && this.saldo >= valor) {
-            this.saldo -= valor;
-            destino.depositar(valor);
-            adicionarTransacao(valor, TipoTransacao.TRANSFERENCIA,
-                    "Transferência para " + destino.getTitular().getNome());
-            return true;
+        if (destino != null && valor != null && valor > 0) {
+            boolean sacou = this.sacar(valor); 
+            if (sacou) {
+                destino.depositar(valor);
+                adicionarTransacao(valor, TipoTransacao.TRANSFERENCIA,
+                        "Transferência para " + destino.getTitular().getNome());
+                return true;
+            }
         }
         return false;
+
     }
 
     public void adicionarTransacao(Double valor, TipoTransacao tipo, String desc) {
@@ -78,7 +81,7 @@ public class Conta {
 
     @Override
     public String toString() {
-        return "Conta [numero=" + numero + ", agencia=" 
-        + agencia + ", saldo=" + saldo + ", titular=" + titular + "]";
+        return "Conta [numero=" + numero + ", agencia="
+                + agencia + ", saldo=" + saldo + ", titular=" + titular + "]";
     }
 }
