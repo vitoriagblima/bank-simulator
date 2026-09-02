@@ -30,9 +30,13 @@ public class Conta {
     }
 
     public boolean sacar(Double valor) {
+        return sacar(valor, TipoTransacao.SAQUE, "Saque");
+    }
+
+    public boolean sacar(Double valor, TipoTransacao tipo, String descricao) {
         if (valor != null && valor > 0 && saldo >= valor) {
             saldo -= valor;
-            adicionarTransacao(valor, TipoTransacao.SAQUE, "Saque");
+            adicionarTransacao(valor, tipo, descricao);
             return true;
         }
         return false;
@@ -40,16 +44,15 @@ public class Conta {
 
     public boolean transferir(Double valor, Conta destino) {
         if (destino != null && valor != null && valor > 0) {
-            boolean sacou = this.sacar(valor); 
+            String descricao = "Transferência para " + destino.getTitular().getNome();
+            
+            boolean sacou = this.sacar(valor, TipoTransacao.TRANSFERENCIA, descricao); 
             if (sacou) {
                 destino.depositar(valor);
-                adicionarTransacao(valor, TipoTransacao.TRANSFERENCIA,
-                        "Transferência para " + destino.getTitular().getNome());
                 return true;
             }
         }
         return false;
-
     }
 
     public void adicionarTransacao(Double valor, TipoTransacao tipo, String desc) {
