@@ -125,9 +125,7 @@ classDiagram
         -String nome
         -String documento
         -TipoCliente tipoCliente
-        +getNome() String
-        +getDocumento() String
-        +getTipoCliente() TipoCliente
+        +toString() String
     }
 
     class Conta {
@@ -143,6 +141,7 @@ classDiagram
         +transferir(Double, Conta) boolean
         +adicionarTransacao(Double, TipoTransacao, String) void
         +imprimirExtrato() void
+        +toString() String
     }
 
     class ContaCorrente {
@@ -151,6 +150,7 @@ classDiagram
         -Double taxaManutencao
         +sacar(Double, TipoTransacao, String) boolean
         +cobrarTaxaManutencao() void
+        +toString() String
     }
 
     class ContaPoupanca {
@@ -165,6 +165,7 @@ classDiagram
         -Double valor
         -TipoTransacao tipo
         -String descricao
+        +toString() String
     }
 
     class Banco {
