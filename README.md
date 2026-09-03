@@ -14,6 +14,8 @@ O objetivo não é construir um sistema bancário completo, e sim usar um domín
 
 > **Status atual:** projeto em evolução. A versão atual roda 100% em memória, via `Main.java` (console). Conforme os estudos avançam, o projeto será migrado para uma arquitetura **Maven** com **Spring (Boot)**, **JPA/Hibernate** e banco de dados **H2**.
 
+> **Nota de evolução:** Este repositório reflete o meu aprendizado prático e incremental. Enquanto esta primeira versão em Java puro estiver ativa, o código poderá passar por constantes ajustes e refatorações (melhorias de encapsulamento, visibilidade de atributos, tratamento de exceções e precisão decimal) à medida que consolido novas boas práticas, servindo como base sólida antes de avançar para a próxima versão oficial com Maven e Spring.
+
 ## Objetivo do projeto
 
 Este repositório documenta minha evolução no aprendizado de Java, começando pelos fundamentos da linguagem e da orientação a objetos antes de introduzir frameworks e persistência de dados. A ideia é:
