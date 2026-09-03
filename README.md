@@ -1,1 +1,230 @@
-# bank-simulator
+# Bank Simulator
+
+![Java](https://img.shields.io/badge/Java-11%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![POO](https://img.shields.io/badge/POO-Programação%20Orientada%20a%20Objetos-212121?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-212121?style=for-the-badge)
+![Maven](https://img.shields.io/badge/Maven-Próxima%20etapa-212121?style=for-the-badge&logo=apachemaven&logoColor=C71A36)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Próxima%20etapa-212121?style=for-the-badge&logo=springboot&logoColor=6DB33F)
+![JPA](https://img.shields.io/badge/JPA%20%2F%20Hibernate-Próxima%20etapa-212121?style=for-the-badge&logo=hibernate&logoColor=59666C)
+![H2](https://img.shields.io/badge/H2-Próxima%20etapa-212121?style=for-the-badge)
+
+Simulador de operações bancárias desenvolvido em **Java puro**, criado como projeto de estudo para consolidar os **fundamentos da Programação Orientada a Objetos (POO)**.
+
+O objetivo não é construir um sistema bancário completo, e sim usar um domínio simples e conhecido (contas, clientes, transações) como pretexto para praticar os pilares da POO, boas práticas de modelagem de classes e organização de código em Java.
+
+> **Status atual:** projeto em evolução. A versão atual roda 100% em memória, via `Main.java` (console). Conforme os estudos avançam, o projeto será migrado para uma arquitetura **Maven** com **Spring (Boot)**, **JPA/Hibernate** e banco de dados **H2**.
+
+## Objetivo do projeto
+
+Este repositório documenta minha evolução no aprendizado de Java, começando pelos fundamentos da linguagem e da orientação a objetos antes de introduzir frameworks e persistência de dados. A ideia é:
+
+1. Dominar POO e Java "puro" (sem frameworks);
+2. Depois, empacotar o projeto com **Maven**;
+3. Depois, adicionar **Spring / Spring Boot**;
+4. Depois, adicionar persistência com **JPA (Hibernate)** e banco **H2** (em memória).
+
+Cada etapa terá sua própria branch/tag, permitindo comparar o "antes e depois" da arquitetura.
+
+## Fundamentos de Java e POO praticados
+
+| Conceito | Onde aparece no projeto |
+|---|---|
+| **Abstração** | `Conta` define o comportamento comum a qualquer tipo de conta (depositar, sacar, transferir, extrato), escondendo os detalhes específicos de cada subtipo. |
+| **Herança** | `ContaCorrente` e `ContaPoupanca` estendem `Conta`, reaproveitando atributos e comportamentos da superclasse. |
+| **Polimorfismo** | O método `sacar()` é sobrescrito (`@Override`) de forma diferente em `ContaCorrente` (considera limite especial) e `ContaPoupanca` (sem limite). O `Banco` manipula qualquer conta como `Conta`, sem saber o tipo concreto. |
+| **Encapsulamento** | Atributos como `saldo`, `numero` e `titular` são privados/protegidos, expostos apenas via getters e métodos de comportamento (`depositar`, `sacar`), nunca alterados diretamente de fora da classe. |
+| **Sobrecarga de métodos (overloading)** | `sacar(Double valor)` e `sacar(Double valor, TipoTransacao tipo, String descricao)` na classe `Conta`. |
+| **Classes `final`** | `ContaCorrente` e `ContaPoupanca` são `final`, impedindo novas heranças a partir delas — uma decisão de design proposital. |
+| **Enums** | `TipoCliente` e `TipoTransacao` substituem "strings mágicas" por tipos seguros e expressivos. |
+| **Composição** | `Conta` possui um `Cliente` (titular) e uma lista de `Transacao`; `Banco` possui uma lista de `Conta`. Relações "tem-um" em vez de herança. |
+| **Coleções (`List`/`ArrayList`)** | Usadas em `Banco` (lista de contas) e `Conta` (histórico de transações). |
+| **Sobrescrita de `toString()`** | Cada entidade define sua própria representação textual, facilitando debug e exibição no console. |
+| **Construtores default e customizados** | Todas as entidades possuem construtor vazio (útil futuramente para JPA) e construtor com parâmetros. |
+| **Data e hora (`java.time`)** | `Transacao` usa `LocalDateTime` para registrar o momento de cada operação. |
+| **Separação em pacotes** | `application` (ponto de entrada) e `entities` (modelo de domínio), antecipando a separação em camadas que o Spring exigirá futuramente (`controller`, `service`, `repository`, `entity`). |
+
+## Estrutura do projeto
+
+```text
+bank-simulator/
+└── src/
+    ├── application/
+    │   └── Main.java            # Ponto de entrada (simula operações no console)
+    └── entities/
+        ├── Banco.java           # Agrega e gerencia as contas
+        ├── Cliente.java         # Titular da conta
+        ├── Conta.java           # Classe base/abstrata do domínio
+        ├── ContaCorrente.java   # Conta com limite especial e taxa de manutenção
+        ├── ContaPoupanca.java   # Conta com rendimento por juros
+        ├── Transacao.java       # Registro de cada movimentação
+        ├── TipoCliente.java     # Enum: PESSOA_FISICA, PESSOA_JURIDICA
+        └── TipoTransacao.java   # Enum: DEPOSITO, SAQUE, TRANSFERENCIA, TAXA_MANUTENCAO, RENDIMENTO
+```
+
+## Funcionalidades atuais
+
+- Criar clientes (pessoa física/jurídica)
+- Criar contas correntes (com limite especial e taxa de manutenção) e contas poupança (com rendimento)
+- Depositar, sacar e transferir valores entre contas
+- Cobrar taxa de manutenção (conta corrente) e render juros (conta poupança)
+- Registrar e imprimir extrato de transações por conta
+- Buscar conta pelo número através do `Banco`
+
+
+## Exemplo de Execução (Console)
+
+Ao executar a classe **Main.java**, a aplicação simula o ciclo de vida completo das operações bancárias:
+
+```text
+=== 1. CONTAS RECÉM-CRIADAS (SALDO INICIAL) ===
+Tipo: ContaCorrente | Número da Conta: 1001 | Agência: 1 | Saldo: R$ 0.00 | Cliente: João Silva
+Tipo: ContaPoupanca | Número da Conta: 2001 | Agência: 1 | Saldo: R$ 0.00 | Cliente: Maria Souza
+
+=== 2. REALIZANDO MOVIMENTAÇÕES ===
+Saque de R$ 1300,00 na Conta Corrente: true
+Saque de R$ 5000,00 na Conta Poupança: false
+
+=== 3. SALDOS FINAIS COM TIPO DE CONTA ===
+Conta Corrente | Número: 1001 | Agência: 1 | Saldo: R$ -420.00 | Titular: João Silva | Limite Especial: R$ 500.00 | Taxa Manutenção: R$ 20.00
+Conta Poupança | Número: 2001 | Agência: 1 | Saldo: R$ 2110.50 | Titular: Maria Souza | Taxa Rendimento: 0.005
+
+=== 4. EXTRATO - CONTA CORRENTE (JOÃO) ===
+Transacao: DEPOSITO | Valor: 1000.0 | Descricao: Depósito
+Transacao: SAQUE | Valor: 1300.0 | Descricao: Saque
+Transacao: TRANSFERENCIA | Valor: 100.0 | Descricao: Transferência para Maria Souza
+Transacao: TAXA_MANUTENCAO | Valor: 20.0 | Descricao: Cobrança de taxa de manutenção
+
+=== 5. EXTRATO - CONTA POUPANÇA (MARIA) ===
+Transacao: DEPOSITO | Valor: 2000.0 | Descricao: Depósito
+Transacao: DEPOSITO | Valor: 100.0 | Descricao: Depósito
+Transacao: RENDIMENTO | Valor: 10.5 | Descricao: Aplicação de rendimento
+
+=== 6. BUSCA DE CONTA PELO NÚMERO ===
+Conta Corrente | Número: 1001 | Agência: 1 | Saldo: R$ -420.00 | Titular: João Silva | Limite Especial: R$ 500.00 | Taxa Manutenção: R$ 20.00
+```
+
+## Como executar
+
+Pré-requisito: JDK instalado (11+).
+
+```bash
+# Compilar
+javac -d bin src/application/Main.java src/entities/*.java
+
+# Executar
+java -cp bin application.Main
+```
+
+Ou, se preferir, basta abrir o projeto em uma IDE (VS Code, IntelliJ, Eclipse) e rodar a classe `Main.java` diretamente.
+
+## Diagrama UML (classes)
+
+```mermaid
+classDiagram
+    class Cliente {
+        -String nome
+        -String documento
+        -TipoCliente tipoCliente
+        +getNome() String
+        +getDocumento() String
+        +getTipoCliente() TipoCliente
+    }
+
+    class Conta {
+        <<abstract>>
+        -Integer numero
+        -Integer agencia
+        #Double saldo
+        -Cliente titular
+        -List~Transacao~ transacoes
+        +depositar(Double) void
+        +sacar(Double) boolean
+        +sacar(Double, TipoTransacao, String) boolean
+        +transferir(Double, Conta) boolean
+        +adicionarTransacao(Double, TipoTransacao, String) void
+        +imprimirExtrato() void
+    }
+
+    class ContaCorrente {
+        <<final>>
+        -Double limiteEspecial
+        -Double taxaManutencao
+        +sacar(Double, TipoTransacao, String) boolean
+        +cobrarTaxaManutencao() void
+    }
+
+    class ContaPoupanca {
+        <<final>>
+        -double taxaRendimento
+        +sacar(Double) boolean
+        +renderJuros() void
+    }
+
+    class Transacao {
+        -LocalDateTime dataHora
+        -Double valor
+        -TipoTransacao tipo
+        -String descricao
+    }
+
+    class Banco {
+        -String nome
+        -List~Conta~ contas
+        +adicionarConta(Conta) void
+        +buscarConta(Integer) Conta
+        +listarContas() void
+    }
+
+    class TipoCliente {
+        <<enumeration>>
+        PESSOA_FISICA
+        PESSOA_JURIDICA
+    }
+
+    class TipoTransacao {
+        <<enumeration>>
+        DEPOSITO
+        SAQUE
+        TRANSFERENCIA
+        TAXA_MANUTENCAO
+        RENDIMENTO
+    }
+
+    Conta <|-- ContaCorrente
+    Conta <|-- ContaPoupanca
+    Conta "1" o-- "1" Cliente : titular
+    Conta "1" *-- "many" Transacao : historico
+    Banco "1" o-- "many" Conta : gerencia
+    Cliente --> TipoCliente
+    Transacao --> TipoTransacao
+```
+
+**Legenda das relações:**
+- `<|--` Herança (`ContaCorrente` e `ContaPoupanca` estendem `Conta`)
+- `*--` Composição (as transações pertencem exclusivamente ao ciclo de vida da conta)
+- `-->` Associação/dependência (uso de um enum)
+- `o--` Agregação (Cliente e Conta existem de forma independente do contêiner)
+
+
+## Roadmap (próximas etapas)
+
+- [x] Modelagem do domínio em Java puro (POO)
+- [ ] Migração para projeto **Maven** (gerenciamento de dependências e build)
+- [ ] Introdução ao **Spring / Spring Boot** (camadas de Controller e Service)
+- [ ] Persistência com **JPA / Hibernate**
+- [ ] Banco de dados **H2** (em memória, para testes/desenvolvimento)
+- [ ] Testes automatizados (JUnit)
+- [ ] Exposição de uma API REST para as operações bancárias
+
+## Sobre este repositório
+
+Este projeto faz parte da minha trilha de estudos em Java, evoluindo de forma incremental:
+
+**Java + POO (atual) → Maven → Spring → JPA + H2**
+
+Cada etapa é documentada aqui no README conforme avança, servindo tanto de portfólio quanto de registro de aprendizado.
+
+
+## Licença
+
+Distribuído sob os termos definidos no arquivo [LICENSE](./LICENSE).
