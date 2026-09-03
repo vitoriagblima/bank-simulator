@@ -3,13 +3,13 @@ package entities;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Conta {
+public abstract class Conta {
     private Integer numero;
     private Integer agencia;
     protected Double saldo;
     private Cliente titular;
 
-    List<Transacao> transacoes = new ArrayList<>();
+    private List<Transacao> transacoes = new ArrayList<>();
 
     public Conta() {
         this.saldo = 0.0;
