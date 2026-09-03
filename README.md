@@ -3,10 +3,16 @@
 ![Java](https://img.shields.io/badge/Java-11%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![POO](https://img.shields.io/badge/POO-Programação%20Orientada%20a%20Objetos-212121?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-212121?style=for-the-badge)
-![Maven](https://img.shields.io/badge/Maven-Próxima%20etapa-212121?style=for-the-badge&logo=apachemaven&logoColor=C71A36)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Próxima%20etapa-212121?style=for-the-badge&logo=springboot&logoColor=6DB33F)
-![JPA](https://img.shields.io/badge/JPA%20%2F%20Hibernate-Próxima%20etapa-212121?style=for-the-badge&logo=hibernate&logoColor=59666C)
-![H2](https://img.shields.io/badge/H2-Próxima%20etapa-212121?style=for-the-badge)
+
+| Camada | Tecnologia | Status no Projeto |
+|---|---|---|
+| Linguagem & Paradigma | Java 11+ / POO | 🟢 Concluído (em refinamento) |
+| Gerenciador de Build | Apache Maven | 🟡 Próxima etapa |
+| Framework Web | Spring Boot (REST) | ⚪ Planejado |
+| Persistência de Dados | Spring Data JPA / Hibernate | ⚪ Planejado |
+| Banco de Dados | H2 Database (em memória) | ⚪ Planejado |
+
+---
 
 Simulador de operações bancárias desenvolvido em **Java puro**, criado como projeto de estudo para consolidar os **fundamentos da Programação Orientada a Objetos (POO)**.
 
