@@ -3,27 +3,20 @@
 ![Java](https://img.shields.io/badge/Java-11%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![POO](https://img.shields.io/badge/POO-Programação%20Orientada%20a%20Objetos-212121?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-212121?style=for-the-badge)
-![Maven](https://img.shields.io/badge/Maven-Próxima%20etapa-212121?style=for-the-badge&logo=apachemaven&logoColor=C71A36)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Próxima%20etapa-212121?style=for-the-badge&logo=springboot&logoColor=6DB33F)
-![JPA](https://img.shields.io/badge/JPA%20%2F%20Hibernate-Próxima%20etapa-212121?style=for-the-badge&logo=hibernate&logoColor=59666C)
-![H2](https://img.shields.io/badge/H2-Próxima%20etapa-212121?style=for-the-badge)
+
+| Camada | Tecnologia | Status no Projeto |
+|---|---|---|
+| Linguagem & Paradigma | Java 11+ / POO | 🟢 Concluído (em refinamento) |
+| Gerenciador de Build | Apache Maven | 🟡 Próxima etapa |
+| Framework Web | Spring Boot (REST) | ⚪ Planejado |
+| Persistência de Dados | Spring Data JPA / Hibernate | ⚪ Planejado |
+| Banco de Dados | H2 Database (em memória) | ⚪ Planejado |
+
+---
 
 Simulador de operações bancárias desenvolvido em **Java puro**, criado como projeto de estudo para consolidar os **fundamentos da Programação Orientada a Objetos (POO)**.
 
-O objetivo não é construir um sistema bancário completo, e sim usar um domínio simples e conhecido (contas, clientes, transações) como pretexto para praticar os pilares da POO, boas práticas de modelagem de classes e organização de código em Java.
-
-> **Status atual:** projeto em evolução. A versão atual roda 100% em memória, via `Main.java` (console). Conforme os estudos avançam, o projeto será migrado para uma arquitetura **Maven** com **Spring (Boot)**, **JPA/Hibernate** e banco de dados **H2**.
-
-## Objetivo do projeto
-
-Este repositório documenta minha evolução no aprendizado de Java, começando pelos fundamentos da linguagem e da orientação a objetos antes de introduzir frameworks e persistência de dados. A ideia é:
-
-1. Dominar POO e Java "puro" (sem frameworks);
-2. Depois, empacotar o projeto com **Maven**;
-3. Depois, adicionar **Spring / Spring Boot**;
-4. Depois, adicionar persistência com **JPA (Hibernate)** e banco **H2** (em memória).
-
-Cada etapa terá sua própria branch/tag, permitindo comparar o "antes e depois" da arquitetura.
+> **Nota de evolução:** Este repositório reflete o meu aprendizado prático e incremental. Enquanto esta primeira versão em Java puro estiver ativa, o código poderá passar por constantes ajustes e refatorações (melhorias de encapsulamento, visibilidade de atributos, tratamento de exceções e precisão decimal) à medida que consolido novas boas práticas, servindo como base sólida antes de avançar para a próxima versão oficial com Maven e Spring. Cada etapa terá sua própria branch/tag, permitindo comparar o "antes e depois" da arquitetura.
 
 ## Fundamentos de Java e POO praticados
 
@@ -39,7 +32,7 @@ Cada etapa terá sua própria branch/tag, permitindo comparar o "antes e depois"
 | **Composição** | `Conta` possui um `Cliente` (titular) e uma lista de `Transacao`; `Banco` possui uma lista de `Conta`. Relações "tem-um" em vez de herança. |
 | **Coleções (`List`/`ArrayList`)** | Usadas em `Banco` (lista de contas) e `Conta` (histórico de transações). |
 | **Sobrescrita de `toString()`** | Cada entidade define sua própria representação textual, facilitando debug e exibição no console. |
-| **Construtores default e customizados** | Todas as entidades possuem construtor vazio (útil futuramente para JPA) e construtor com parâmetros. |
+| **Construtores default e customizados** | Todas as entidades possuem construtor vazio e construtor com parâmetros, facilitando a evolução futura do modelo para frameworks de persistência.|
 | **Data e hora (`java.time`)** | `Transacao` usa `LocalDateTime` para registrar o momento de cada operação. |
 | **Separação em pacotes** | `application` (ponto de entrada) e `entities` (modelo de domínio), antecipando a separação em camadas que o Spring exigirá futuramente (`controller`, `service`, `repository`, `entity`). |
 
@@ -199,14 +192,6 @@ classDiagram
     Cliente --> TipoCliente
     Transacao --> TipoTransacao
 ```
-
-**Legenda das relações:**
-- `<|--` Herança (`ContaCorrente` e `ContaPoupanca` estendem `Conta`)
-- `*--` Composição (as transações pertencem exclusivamente ao ciclo de vida da conta)
-- `-->` Associação/dependência (uso de um enum)
-- `o--` Agregação (Cliente e Conta existem de forma independente do contêiner)
-
-
 ## Roadmap (próximas etapas)
 
 - [x] Modelagem do domínio em Java puro (POO)
@@ -216,15 +201,6 @@ classDiagram
 - [ ] Banco de dados **H2** (em memória, para testes/desenvolvimento)
 - [ ] Testes automatizados (JUnit)
 - [ ] Exposição de uma API REST para as operações bancárias
-
-## Sobre este repositório
-
-Este projeto faz parte da minha trilha de estudos em Java, evoluindo de forma incremental:
-
-**Java + POO (atual) → Maven → Spring → JPA + H2**
-
-Cada etapa é documentada aqui no README conforme avança, servindo tanto de portfólio quanto de registro de aprendizado.
-
 
 ## Licença
 
