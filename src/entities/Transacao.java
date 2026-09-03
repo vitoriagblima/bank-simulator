@@ -1,6 +1,7 @@
 package entities;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Transacao {
 
@@ -8,6 +9,8 @@ public class Transacao {
     private Double valor;
     private TipoTransacao tipo;
     private String descricao;
+
+    private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public Transacao() {
         this.dataHora = LocalDateTime.now();
@@ -37,7 +40,8 @@ public class Transacao {
     }
 
     public String toString() {
-        return "Transacao: " + this.tipo + " | Valor: " 
-        + this.valor + " | Descricao: " + this.descricao;
+        String dataFormatada = this.dataHora.format(FORMATADOR);
+        return "Transacao: " + this.tipo + " | Data hora: " + dataFormatada + " | Valor: " + this.valor
+                + " | Descricao: " + this.descricao;
     }
 }
