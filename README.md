@@ -158,7 +158,7 @@ classDiagram
     -Double valor
     -TipoTransacao tipo
     -String descricao
-    -{static} DateTimeFormatter FORMATADOR
+    -DateTimeFormatter FORMATADOR$
     +toString() String
 }
     class Banco {
