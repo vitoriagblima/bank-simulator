@@ -4,13 +4,13 @@
 ![POO](https://img.shields.io/badge/POO-Programação%20Orientada%20a%20Objetos-212121?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-212121?style=for-the-badge)
 
-| Camada | Tecnologia | Status no Projeto |
-|---|---|---|
-| Linguagem & Paradigma | Java 11+ / POO | 🟢 Concluído (em refinamento) |
-| Gerenciador de Build | Apache Maven | 🟡 Próxima etapa |
-| Framework Web | Spring Boot (REST) | ⚪ Planejado |
-| Persistência de Dados | Spring Data JPA / Hibernate | ⚪ Planejado |
-| Banco de Dados | H2 Database (em memória) | ⚪ Planejado |
+| Camada                | Tecnologia                  | Status no Projeto            |
+| --------------------- | --------------------------- | ---------------------------- |
+| Linguagem & Paradigma | Java 11+ / POO              | 🟢 Concluído (em refinamento) |
+| Gerenciador de Build  | Apache Maven                | 🟡 Próxima etapa              |
+| Framework Web         | Spring Boot (REST)          | ⚪ Planejado                  |
+| Persistência de Dados | Spring Data JPA / Hibernate | ⚪ Planejado                  |
+| Banco de Dados        | H2 Database (em memória)    | ⚪ Planejado                  |
 
 ---
 
@@ -20,21 +20,21 @@ Simulador de operações bancárias desenvolvido em **Java puro**, criado como p
 
 ## Fundamentos de Java e POO praticados
 
-| Conceito | Onde aparece no projeto |
-|---|---|
-| **Abstração** | `Conta` define o comportamento comum a qualquer tipo de conta (depositar, sacar, transferir, extrato), escondendo os detalhes específicos de cada subtipo. |
-| **Herança** | `ContaCorrente` e `ContaPoupanca` estendem `Conta`, reaproveitando atributos e comportamentos da superclasse. |
-| **Polimorfismo** | O método `sacar()` é sobrescrito (`@Override`) de forma diferente em `ContaCorrente` (considera limite especial) e `ContaPoupanca` (sem limite). O `Banco` manipula qualquer conta como `Conta`, sem saber o tipo concreto. |
-| **Encapsulamento** | Atributos como `saldo`, `numero` e `titular` são privados/protegidos, expostos apenas via getters e métodos de comportamento (`depositar`, `sacar`), nunca alterados diretamente de fora da classe. |
-| **Sobrecarga de métodos (overloading)** | `sacar(Double valor)` e `sacar(Double valor, TipoTransacao tipo, String descricao)` na classe `Conta`. |
-| **Classes `final`** | `ContaCorrente` e `ContaPoupanca` são `final`, impedindo novas heranças a partir delas — uma decisão de design proposital. |
-| **Enums** | `TipoCliente` e `TipoTransacao` substituem "strings mágicas" por tipos seguros e expressivos. |
-| **Composição** | `Conta` possui um `Cliente` (titular) e uma lista de `Transacao`; `Banco` possui uma lista de `Conta`. Relações "tem-um" em vez de herança. |
-| **Coleções (`List`/`ArrayList`)** | Usadas em `Banco` (lista de contas) e `Conta` (histórico de transações). |
-| **Sobrescrita de `toString()`** | Cada entidade define sua própria representação textual, facilitando debug e exibição no console. |
-| **Construtores default e customizados** | Todas as entidades possuem construtor vazio e construtor com parâmetros, facilitando a evolução futura do modelo para frameworks de persistência.|
-| **Data e hora (`java.time`)** | `Transacao` usa `LocalDateTime` para registrar o momento de cada operação. |
-| **Separação em pacotes** | `application` (ponto de entrada) e `entities` (modelo de domínio), antecipando a separação em camadas que o Spring exigirá futuramente (`controller`, `service`, `repository`, `entity`). |
+| Conceito                                | Onde aparece no projeto                                                                                                                                                                                                     |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Abstração**                           | `Conta` define o comportamento comum a qualquer tipo de conta (depositar, sacar, transferir, extrato), escondendo os detalhes específicos de cada subtipo.                                                                  |
+| **Herança**                             | `ContaCorrente` e `ContaPoupanca` estendem `Conta`, reaproveitando atributos e comportamentos da superclasse.                                                                                                               |
+| **Polimorfismo**                        | O método `sacar()` é sobrescrito (`@Override`) de forma diferente em `ContaCorrente` (considera limite especial) e `ContaPoupanca` (sem limite). O `Banco` manipula qualquer conta como `Conta`, sem saber o tipo concreto. |
+| **Encapsulamento**                      | Atributos como `saldo`, `numero` e `titular` são privados/protegidos, expostos apenas via getters e métodos de comportamento (`depositar`, `sacar`), nunca alterados diretamente de fora da classe.                         |
+| **Sobrecarga de métodos (overloading)** | `sacar(Double valor)` e `sacar(Double valor, TipoTransacao tipo, String descricao)` na classe `Conta`.                                                                                                                      |
+| **Classes `final`**                     | `ContaCorrente` e `ContaPoupanca` são `final`, impedindo novas heranças a partir delas — uma decisão de design proposital.                                                                                                  |
+| **Enums**                               | `TipoCliente` e `TipoTransacao` substituem "strings mágicas" por tipos seguros e expressivos.                                                                                                                               |
+| **Composição**                          | `Conta` possui um `Cliente` (titular) e uma lista de `Transacao`; `Banco` possui uma lista de `Conta`. Relações "tem-um" em vez de herança.                                                                                 |
+| **Coleções (`List`/`ArrayList`)**       | Usadas em `Banco` (lista de contas) e `Conta` (histórico de transações).                                                                                                                                                    |
+| **Sobrescrita de `toString()`**         | Cada entidade define sua própria representação textual, facilitando debug e exibição no console.                                                                                                                            |
+| **Construtores default e customizados** | Todas as entidades possuem construtor vazio e construtor com parâmetros, facilitando a evolução futura do modelo para frameworks de persistência.                                                                           |
+| **Data e hora (`java.time`)**           | `Transacao` usa `LocalDateTime` para registrar o momento de cada operação.                                                                                                                                                  |
+| **Separação em pacotes**                | `application` (ponto de entrada) e `entities` (modelo de domínio), antecipando a separação em camadas que o Spring exigirá futuramente (`controller`, `service`, `repository`, `entity`).                                   |
 
 ## Estrutura do projeto
 
@@ -82,15 +82,15 @@ Conta Corrente | Número: 1001 | Agência: 1 | Saldo: R$ -420.00 | Titular: Joã
 Conta Poupança | Número: 2001 | Agência: 1 | Saldo: R$ 2110.50 | Titular: Maria Souza | Taxa Rendimento: 0.005
 
 === 4. EXTRATO - CONTA CORRENTE (JOÃO) ===
-Transacao: DEPOSITO | Valor: 1000.0 | Descricao: Depósito
-Transacao: SAQUE | Valor: 1300.0 | Descricao: Saque
-Transacao: TRANSFERENCIA | Valor: 100.0 | Descricao: Transferência para Maria Souza
-Transacao: TAXA_MANUTENCAO | Valor: 20.0 | Descricao: Cobrança de taxa de manutenção
+Transacao: DEPOSITO | Data hora: 04/09/2026 10:55:16 | Valor: 1000.0 | Descricao: Depósito
+Transacao: SAQUE | Data hora: 04/09/2026 10:55:16 | Valor: 1300.0 | Descricao: Saque
+Transacao: TRANSFERENCIA | Data hora: 04/09/2026 10:55:16 | Valor: 100.0 | Descricao: Transferência para Maria Souza
+Transacao: TAXA_MANUTENCAO | Data hora: 04/09/2026 10:55:16 | Valor: 20.0 | Descricao: Cobrança de taxa de manutenção
 
 === 5. EXTRATO - CONTA POUPANÇA (MARIA) ===
-Transacao: DEPOSITO | Valor: 2000.0 | Descricao: Depósito
-Transacao: DEPOSITO | Valor: 100.0 | Descricao: Depósito
-Transacao: RENDIMENTO | Valor: 10.5 | Descricao: Aplicação de rendimento
+Transacao: DEPOSITO | Data hora: 04/09/2026 10:55:16 | Valor: 2000.0 | Descricao: Depósito
+Transacao: DEPOSITO | Data hora: 04/09/2026 10:55:16 | Valor: 100.0 | Descricao: Depósito
+Transacao: RENDIMENTO | Data hora: 04/09/2026 10:55:16 | Valor: 10.5 | Descricao: Aplicação de rendimento
 
 === 6. BUSCA DE CONTA PELO NÚMERO ===
 Conta Corrente | Número: 1001 | Agência: 1 | Saldo: R$ -420.00 | Titular: João Silva | Limite Especial: R$ 500.00 | Taxa Manutenção: R$ 20.00
@@ -154,13 +154,13 @@ classDiagram
     }
 
     class Transacao {
-        -LocalDateTime dataHora
-        -Double valor
-        -TipoTransacao tipo
-        -String descricao
-        +toString() String
-    }
-
+    -ZonedDateTime dataHora
+    -Double valor
+    -TipoTransacao tipo
+    -String descricao
+    -{static} DateTimeFormatter FORMATADOR
+    +toString() String
+}
     class Banco {
         -String nome
         -List~Conta~ contas
