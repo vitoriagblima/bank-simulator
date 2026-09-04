@@ -1,11 +1,12 @@
 package entities;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Transacao {
 
-    private LocalDateTime dataHora;
+    private ZonedDateTime dataHora;
     private Double valor;
     private TipoTransacao tipo;
     private String descricao;
@@ -13,17 +14,17 @@ public class Transacao {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public Transacao() {
-        this.dataHora = LocalDateTime.now();
+        this.dataHora = ZonedDateTime.now(ZoneId.systemDefault());
     }
 
     public Transacao(Double valor, TipoTransacao tipo, String descricao) {
         this.valor = valor;
         this.tipo = tipo;
         this.descricao = descricao;
-        this.dataHora = LocalDateTime.now();
+        this.dataHora = ZonedDateTime.now(ZoneId.systemDefault());
     }
 
-    public LocalDateTime getDataHora() {
+    public ZonedDateTime getDataHora() {
         return this.dataHora;
     }
 
