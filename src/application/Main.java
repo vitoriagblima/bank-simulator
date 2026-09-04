@@ -1,5 +1,7 @@
 package application;
 
+import java.util.TimeZone;
+
 import entities.Banco;
 import entities.Cliente;
 import entities.Conta;
@@ -11,6 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
 
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
         Banco banco = new Banco("Banco Java");
 
         Cliente joao = new Cliente("João Silva", "123.456.789-00", TipoCliente.PESSOA_FISICA);
@@ -26,7 +29,7 @@ public class Main {
         banco.listarContas();
 
         System.out.println("\n=== 2. REALIZANDO MOVIMENTAÇÕES ===");
-        
+
         ccJoao.depositar(1000.0);
         cpMaria.depositar(2000.0);
 
@@ -53,5 +56,6 @@ public class Main {
         System.out.println("\n=== 6. BUSCA DE CONTA PELO NÚMERO ===");
         Conta busca1 = banco.buscarConta(1001);
         System.out.println(busca1);
+
     }
 }
