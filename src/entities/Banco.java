@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Banco {
     private String nome;
 
-    List<Conta> contas = new ArrayList<>();
+    private List<Conta> contas = new ArrayList<>();
 
     public Banco() {
     }
