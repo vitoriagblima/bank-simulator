@@ -13,10 +13,10 @@ public final class ContaPoupanca extends Conta {
     }
 
     @Override
-    public boolean sacar(Double valor) {
+    public boolean sacar(Double valor, TipoTransacao tipo, String descricao) {
         if (valor != null && valor > 0 && saldo >= valor) {
             saldo -= valor;
-            adicionarTransacao(valor, TipoTransacao.SAQUE, "Saque Conta Poupança");
+            adicionarTransacao(valor, tipo, descricao);
             return true;
         }
         return false;
