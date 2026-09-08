@@ -2,6 +2,7 @@ package entities;
 
 public class Cliente {
 
+    private Long id;
     private String nome;
     private String documento;
     private TipoCliente tipoCliente;
@@ -13,6 +14,10 @@ public class Cliente {
         this.nome = nome;
         this.documento = documento;
         this.tipoCliente = tipoCliente;
+    }
+
+    public Long getId() {
+        return this.id;
     }
 
     public String getNome() {

@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Transacao {
 
+    private Long id;
     private ZonedDateTime dataHora;
     private Double valor;
     private TipoTransacao tipo;
@@ -22,6 +23,10 @@ public class Transacao {
         this.tipo = tipo;
         this.descricao = descricao;
         this.dataHora = ZonedDateTime.now(ZoneId.systemDefault());
+    }
+
+    public Long getId(){
+        return this.id;
     }
 
     public ZonedDateTime getDataHora() {
