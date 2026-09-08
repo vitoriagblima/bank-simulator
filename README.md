@@ -75,25 +75,27 @@ Tipo: ContaPoupanca | Número da Conta: 2001 | Agência: 1 | Saldo: R$ 0.00 | Cl
 
 === 2. REALIZANDO MOVIMENTAÇÕES ===
 Saque de R$ 1300,00 na Conta Corrente: true
-Saque de R$ 5000,00 na Conta Poupança: false
+Saque de R$ 200,00 na Conta Poupança: true
 
 === 3. SALDOS FINAIS COM TIPO DE CONTA ===
 Conta Corrente | Número: 1001 | Agência: 1 | Saldo: R$ -420.00 | Titular: João Silva | Limite Especial: R$ 500.00 | Taxa Manutenção: R$ 20.00
-Conta Poupança | Número: 2001 | Agência: 1 | Saldo: R$ 2110.50 | Titular: Maria Souza | Taxa Rendimento: 0.005
+Conta Poupança | Número: 2001 | Agência: 1 | Saldo: R$ 1909.50 | Titular: Maria Souza | Taxa Rendimento: 0.005
 
 === 4. EXTRATO - CONTA CORRENTE (JOÃO) ===
-Transacao: DEPOSITO | Data hora: 04/09/2026 10:55:16 | Valor: 1000.0 | Descricao: Depósito
-Transacao: SAQUE | Data hora: 04/09/2026 10:55:16 | Valor: 1300.0 | Descricao: Saque
-Transacao: TRANSFERENCIA | Data hora: 04/09/2026 10:55:16 | Valor: 100.0 | Descricao: Transferência para Maria Souza
-Transacao: TAXA_MANUTENCAO | Data hora: 04/09/2026 10:55:16 | Valor: 20.0 | Descricao: Cobrança de taxa de manutenção
+Transacao: DEPOSITO | Data hora: 08/09/2026 10:50:05 | Valor: 1000.0 | Descricao: Depósito
+Transacao: SAQUE | Data hora: 08/09/2026 10:50:05 | Valor: 1300.0 | Descricao: Saque
+Transacao: TRANSFERENCIA | Data hora: 08/09/2026 10:50:05 | Valor: 100.0 | Descricao: Transferência para Maria Souza
+Transacao: TAXA_MANUTENCAO | Data hora: 08/09/2026 10:50:05 | Valor: 20.0 | Descricao: Cobrança de taxa de manutenção
 
 === 5. EXTRATO - CONTA POUPANÇA (MARIA) ===
-Transacao: DEPOSITO | Data hora: 04/09/2026 10:55:16 | Valor: 2000.0 | Descricao: Depósito
-Transacao: DEPOSITO | Data hora: 04/09/2026 10:55:16 | Valor: 100.0 | Descricao: Depósito
-Transacao: RENDIMENTO | Data hora: 04/09/2026 10:55:16 | Valor: 10.5 | Descricao: Aplicação de rendimento
+Transacao: DEPOSITO | Data hora: 08/09/2026 10:50:05 | Valor: 2000.0 | Descricao: Depósito
+Transacao: SAQUE | Data hora: 08/09/2026 10:50:05 | Valor: 200.0 | Descricao: Saque
+Transacao: DEPOSITO | Data hora: 08/09/2026 10:50:05 | Valor: 100.0 | Descricao: Depósito
+Transacao: RENDIMENTO | Data hora: 08/09/2026 10:50:05 | Valor: 9.5 | Descricao: Aplicação de rendimento
 
 === 6. BUSCA DE CONTA PELO NÚMERO ===
 Conta Corrente | Número: 1001 | Agência: 1 | Saldo: R$ -420.00 | Titular: João Silva | Limite Especial: R$ 500.00 | Taxa Manutenção: R$ 20.00
+Conta Poupança | Número: 2001 | Agência: 1 | Saldo: R$ 1909.50 | Titular: Maria Souza | Taxa Rendimento: 0.005
 ```
 
 ## Como executar
@@ -149,7 +151,7 @@ classDiagram
     class ContaPoupanca {
         <<final>>
         -double taxaRendimento
-        +sacar(Double) boolean
+        +sacar(Double, TipoTransacao, String) boolean
         +renderJuros() void
     }
 
