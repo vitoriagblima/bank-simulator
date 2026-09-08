@@ -2,12 +2,13 @@ package application;
 
 import java.util.TimeZone;
 
-import entities.Banco;
-import entities.Cliente;
-import entities.Conta;
-import entities.ContaCorrente;
-import entities.ContaPoupanca;
-import entities.TipoCliente;
+import model.entities.Banco;
+import model.entities.Cliente;
+import model.entities.Conta;
+import model.entities.ContaCorrente;
+import model.entities.ContaPoupanca;
+import model.entities.TipoCliente;
+import model.exceptions.DomainException;
 
 public class Main {
 
@@ -30,18 +31,23 @@ public class Main {
 
         System.out.println("\n=== 2. REALIZANDO MOVIMENTAÇÕES ===");
 
-        ccJoao.depositar(1000.0);
-        cpMaria.depositar(2000.0);
+        try {
+            ccJoao.depositar(1000.0);
+            cpMaria.depositar(2000.0);
 
-        boolean saque1 = ccJoao.sacar(1300.0);
-        System.out.println(String.format("Saque de R$ 1300,00 na Conta Corrente: %b", saque1));
+            ccJoao.sacar(1300.0);
+            System.out.println("Saque de R$ 1300,00 realizado com sucesso na Conta Corrente.");
 
-        boolean saque2 = cpMaria.sacar(200.0);
-        System.out.println(String.format("Saque de R$ 200,00 na Conta Poupança: %b", saque2));
+            cpMaria.sacar(200.0);
+            System.out.println("Saque de R$ 200,00 realizado com sucesso na Conta Poupança.");
 
-        ccJoao.transferir(100.0, cpMaria);
-        cpMaria.renderJuros();
-        ccJoao.cobrarTaxaManutencao();
+            ccJoao.transferir(100.0, cpMaria);
+            cpMaria.renderJuros();
+            ccJoao.cobrarTaxaManutencao();
+
+        } catch (DomainException e) {
+            System.out.println("Erro na operação bancária: " + e.getMessage());
+        }
 
         System.out.println("\n=== 3. SALDOS FINAIS COM TIPO DE CONTA ===");
         System.out.println(ccJoao);
@@ -59,6 +65,5 @@ public class Main {
 
         Conta busca2 = banco.buscarConta(2001);
         System.out.println(busca2);
-
     }
 }
