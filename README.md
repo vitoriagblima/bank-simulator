@@ -117,6 +117,7 @@ Ou, se preferir, basta abrir o projeto em uma IDE (VS Code, IntelliJ, Eclipse) e
 ```mermaid
 classDiagram
     class Cliente {
+        -Long id
         -String nome
         -String documento
         -TipoCliente tipoCliente
@@ -125,6 +126,7 @@ classDiagram
 
     class Conta {
         <<abstract>>
+        -Long id
         -Integer numero
         -Integer agencia
         #Double saldo
@@ -156,12 +158,13 @@ classDiagram
     }
 
     class Transacao {
-    -ZonedDateTime dataHora
-    -Double valor
-    -TipoTransacao tipo
-    -String descricao
-    -DateTimeFormatter FORMATADOR$
-    +toString() String
+        -Long id
+        -ZonedDateTime dataHora
+        -Double valor
+        -TipoTransacao tipo
+        -String descricao
+        -DateTimeFormatter FORMATADOR$
+        +toString() String
 }
     class Banco {
         -String nome
