@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Conta {
+    private Long id;
     private Integer numero;
     private Integer agencia;
     protected Double saldo;
@@ -64,6 +65,10 @@ public abstract class Conta {
         for (Transacao t : transacoes) {
             System.out.println(t);
         }
+    }
+
+    public Long getId(){
+        return this.id;
     }
 
     public Integer getNumero() {
