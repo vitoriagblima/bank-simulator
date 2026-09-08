@@ -36,8 +36,8 @@ public class Main {
         boolean saque1 = ccJoao.sacar(1300.0);
         System.out.println(String.format("Saque de R$ 1300,00 na Conta Corrente: %b", saque1));
 
-        boolean saque2 = cpMaria.sacar(5000.0);
-        System.out.println(String.format("Saque de R$ 5000,00 na Conta Poupança: %b", saque2));
+        boolean saque2 = cpMaria.sacar(200.0);
+        System.out.println(String.format("Saque de R$ 200,00 na Conta Poupança: %b", saque2));
 
         ccJoao.transferir(100.0, cpMaria);
         cpMaria.renderJuros();
@@ -56,6 +56,9 @@ public class Main {
         System.out.println("\n=== 6. BUSCA DE CONTA PELO NÚMERO ===");
         Conta busca1 = banco.buscarConta(1001);
         System.out.println(busca1);
+
+        Conta busca2 = banco.buscarConta(2001);
+        System.out.println(busca2);
 
     }
 }
