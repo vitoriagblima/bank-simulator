@@ -43,7 +43,7 @@ public final class ContaPoupanca extends Conta {
         adicionarTransacao(rendimento, TipoTransacao.RENDIMENTO, "Aplicação de rendimento");
     }
 
-    public double getTaxaRendimento() {
+    public Double getTaxaRendimento() {
         return this.taxaRendimento;
     }
 
