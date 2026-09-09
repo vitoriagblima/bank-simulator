@@ -9,13 +9,15 @@ public final class ContaCorrente extends Conta {
 
     public ContaCorrente() {
         super();
+        this.limiteEspecial = 0.0;
+        this.taxaManutencao = 0.0;
     }
 
     public ContaCorrente(Integer numero, Integer agencia, Cliente cliente, Double limiteEspecial,
             Double taxaManutencao) {
         super(numero, agencia, cliente);
-        this.limiteEspecial = limiteEspecial;
-        this.taxaManutencao = taxaManutencao;
+        setLimiteEspecial(limiteEspecial);
+        setTaxaManutencao(taxaManutencao);
     }
 
     @Override
@@ -45,6 +47,12 @@ public final class ContaCorrente extends Conta {
     }
 
     public void setLimiteEspecial(Double limiteEspecial) {
+        if (limiteEspecial == null) {
+            throw new ValorInvalidoException("O limite especial não pode ser nulo.");
+        }
+        if (limiteEspecial < 0) {
+            throw new ValorInvalidoException("O limite especial não pode ser negativo.");
+        }
         this.limiteEspecial = limiteEspecial;
     }
    
@@ -53,6 +61,12 @@ public final class ContaCorrente extends Conta {
     }
 
      public void setTaxaManutencao(Double taxaManutencao) {
+        if (taxaManutencao == null) {
+            throw new ValorInvalidoException("A taxa de manutenção não pode ser nula.");
+        }
+        if (taxaManutencao < 0) {
+            throw new ValorInvalidoException("A taxa de manutenção não pode ser negativa.");
+        }
         this.taxaManutencao = taxaManutencao;
     }
 
