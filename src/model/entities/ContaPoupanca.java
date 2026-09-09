@@ -9,11 +9,12 @@ public final class ContaPoupanca extends Conta {
 
     public ContaPoupanca() {
         super();
+        this.taxaRendimento = 0.0;
     }
 
-    public ContaPoupanca(Integer numero, Integer agencia, Cliente cliente, double taxaRendimento) {
+    public ContaPoupanca(Integer numero, Integer agencia, Cliente cliente, Double taxaRendimento) {
         super(numero, agencia, cliente);
-        this.taxaRendimento = taxaRendimento;
+        setTaxaRendimento(taxaRendimento);
     }
 
     @Override
@@ -47,7 +48,13 @@ public final class ContaPoupanca extends Conta {
         return this.taxaRendimento;
     }
 
-    public void setTaxaRendimento(double taxaRendimento) {
+    public void setTaxaRendimento(Double taxaRendimento) {
+        if (taxaRendimento == null) {
+            throw new ValorInvalidoException("A taxa de rendimento não pode ser nula.");
+        }
+        if (taxaRendimento <= 0) {
+            throw new ValorInvalidoException("A taxa de rendimento deve ser maior que zero.");
+        }
         this.taxaRendimento = taxaRendimento;
     }
 
