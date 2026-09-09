@@ -34,6 +34,19 @@ public class Testes {
         testarExcecao(() -> cc.transferir(500.0, cp), "Transferência sem saldo");
         testarExcecao(() -> cc.transferir(10.0, null), "Transferência para conta nula");
 
+        // Setters e Construtores - Conta Corrente
+        testarExcecao(() -> cc.setLimiteEspecial(-10.0), "Set limite especial negativo");
+        testarExcecao(() -> cc.setLimiteEspecial(null), "Set limite especial nulo");
+        testarExcecao(() -> cc.setTaxaManutencao(-5.0), "Set taxa manutenção negativa");
+        testarExcecao(() -> cc.setTaxaManutencao(null), "Set taxa manutenção nula");
+        testarExcecao(() -> new ContaCorrente(4, 1, carlos, -100.0, 10.0), "Construtor ContaCorrente com limite negativo");
+
+        // Setters e Construtores - Conta Poupança
+        testarExcecao(() -> cp.setTaxaRendimento(0.0), "Set taxa rendimento zero");
+        testarExcecao(() -> cp.setTaxaRendimento(-0.05), "Set taxa rendimento negativa");
+        testarExcecao(() -> cp.setTaxaRendimento(null), "Set taxa rendimento nula");
+        testarExcecao(() -> new ContaPoupanca(5, 1, ana, -0.01), "Construtor ContaPoupanca com taxa negativa");
+
         // Taxa
         ContaCorrente cc2 = new ContaCorrente(3, 1, carlos, 0.0, 0.0);
         testarExcecao(cc2::cobrarTaxaManutencao, "Taxa de manutenção zerada");
