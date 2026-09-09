@@ -1,58 +1,60 @@
 package model.entities;
 
+import java.math.BigDecimal;
+
 import model.exceptions.DomainException;
 import model.exceptions.SaldoInsuficienteException;
 import model.exceptions.ValorInvalidoException;
 
 public final class ContaPoupanca extends Conta {
-    private Double taxaRendimento;
+    private BigDecimal taxaRendimento;
 
     public ContaPoupanca() {
         super();
-        this.taxaRendimento = 0.0;
+        this.taxaRendimento = BigDecimal.ZERO;
     }
 
-    public ContaPoupanca(Integer numero, Integer agencia, Cliente cliente, Double taxaRendimento) {
+    public ContaPoupanca(Integer numero, Integer agencia, Cliente cliente, BigDecimal taxaRendimento) {
         super(numero, agencia, cliente);
         setTaxaRendimento(taxaRendimento);
     }
 
     @Override
-    public void sacar(Double valor, TipoTransacao tipo, String descricao) {
+    public void sacar(BigDecimal valor, TipoTransacao tipo, String descricao) {
         if (valor == null) {
             throw new ValorInvalidoException("O valor do saque não pode ser nulo.");
         }
-        if (valor <= 0) {
+        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("O valor do saque deve ser maior que zero.");
         }
-        if (valor > saldo) {
+        if (valor.compareTo(saldo) > 0) {
             throw new SaldoInsuficienteException("Saldo insuficiente para realizar o saque.");
         }
-        saldo -= valor;
+        saldo = saldo.subtract(valor);
         adicionarTransacao(valor, tipo, descricao);
     }
 
     public void renderJuros() {
-        if (taxaRendimento == null || taxaRendimento <= 0) {
+        if (taxaRendimento == null || taxaRendimento.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("A taxa de rendimento é inválida para aplicação de juros.");
         }
-        if (saldo <= 0) {
+        if (saldo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new DomainException("Não é possível aplicar rendimentos em uma conta sem saldo positivo.");
         }
-        double rendimento = saldo * taxaRendimento;
-        saldo += rendimento;
+        BigDecimal rendimento = saldo.multiply(taxaRendimento);
+        saldo = saldo.add(rendimento);
         adicionarTransacao(rendimento, TipoTransacao.RENDIMENTO, "Aplicação de rendimento");
     }
 
-    public Double getTaxaRendimento() {
+    public BigDecimal getTaxaRendimento() {
         return this.taxaRendimento;
     }
 
-    public void setTaxaRendimento(Double taxaRendimento) {
+    public void setTaxaRendimento(BigDecimal taxaRendimento) {
         if (taxaRendimento == null) {
             throw new ValorInvalidoException("A taxa de rendimento não pode ser nula.");
         }
-        if (taxaRendimento <= 0) {
+        if (taxaRendimento.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("A taxa de rendimento deve ser maior que zero.");
         }
         this.taxaRendimento = taxaRendimento;
@@ -64,7 +66,7 @@ public final class ContaPoupanca extends Conta {
                 " | Agência: " + getAgencia() +
                 " | Saldo: R$ " + String.format("%.2f", getSaldo()) +
                 " | Titular: " + getTitular().getNome() +
-                " | Taxa Rendimento: " + taxaRendimento;
+                " | Taxa Rendimento: " + String.format("%.2f", getTaxaRendimento());
     }
 
 }

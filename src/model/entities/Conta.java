@@ -1,5 +1,6 @@
 package model.entities;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,52 +11,52 @@ public abstract class Conta {
     private Long id;
     private Integer numero;
     private Integer agencia;
-    protected Double saldo;
+    protected BigDecimal saldo;
     private Cliente titular;
 
     private List<Transacao> transacoes = new ArrayList<>();
 
     public Conta() {
-        this.saldo = 0.0;
+        this.saldo = BigDecimal.ZERO;
     }
 
     public Conta(Integer numero, Integer agencia, Cliente cliente) {
         this.numero = numero;
         this.agencia = agencia;
         this.titular = cliente;
-        this.saldo = 0.0;
+        this.saldo = BigDecimal.ZERO;
     }
 
-    public void depositar(Double valor) {
+    public void depositar(BigDecimal valor) {
         if (valor == null) {
             throw new ValorInvalidoException("O valor do depósito não pode ser nulo.");
         }
-        if (valor <= 0) {
+        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("O valor do depósito deve ser maior que zero.");
         }
-        this.saldo += valor;
+        this.saldo = this.saldo.add(valor);
         adicionarTransacao(valor, TipoTransacao.DEPOSITO, "Depósito");
     }
 
-    public void sacar(Double valor) {
+    public void sacar(BigDecimal valor) {
         sacar(valor, TipoTransacao.SAQUE, "Saque");
     }
 
-    public void sacar(Double valor, TipoTransacao tipo, String descricao) {
+    public void sacar(BigDecimal valor, TipoTransacao tipo, String descricao) {
         if (valor == null) {
             throw new ValorInvalidoException("O valor do saque não pode ser nulo.");
         }
-        if (valor <= 0) {
+        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("O valor do saque deve ser maior que zero.");
         }
-        if (valor > saldo) {
+        if (valor.compareTo(saldo) > 0) {
             throw new SaldoInsuficienteException("Saldo insuficiente para realizar o saque.");
         }
-        this.saldo -= valor;
+        this.saldo = this.saldo.subtract(valor);
         adicionarTransacao(valor, tipo, descricao);
     }
 
-    public void transferir(Double valor, Conta destino) {
+    public void transferir(BigDecimal valor, Conta destino) {
         if (destino == null) {
             throw new ValorInvalidoException("A conta a ser transferida não pode ser nula.");
         }
@@ -64,7 +65,7 @@ public abstract class Conta {
         destino.depositar(valor);
     }
 
-    protected void adicionarTransacao(Double valor, TipoTransacao tipo, String desc) {
+    protected void adicionarTransacao(BigDecimal valor, TipoTransacao tipo, String desc) {
         Transacao novaTransacao = new Transacao(valor, tipo, desc);
         transacoes.add(novaTransacao);
     }
@@ -87,7 +88,7 @@ public abstract class Conta {
         return this.agencia;
     }
 
-    public Double getSaldo() {
+    public BigDecimal getSaldo() {
         return this.saldo;
     }
 
