@@ -6,6 +6,7 @@ import model.entities.ContaCorrente;
 import model.entities.ContaPoupanca;
 import model.entities.TipoCliente;
 import model.exceptions.DomainException;
+import java.math.BigDecimal;
 
 public class Testes {
 
@@ -16,39 +17,39 @@ public class Testes {
         System.out.println("=== MENSAGENS DE EXCEÇÕES LANÇADAS ===\n");
 
         // Depósito
-        ContaCorrente cc = new ContaCorrente(1, 1, carlos, 100.0, 10.0);
-        testarExcecao(() -> cc.depositar(-50.0), "Depósito negativo");
+        ContaCorrente cc = new ContaCorrente(1, 1, carlos, BigDecimal.valueOf(100.0), BigDecimal.valueOf(10.0));
+        testarExcecao(() -> cc.depositar(BigDecimal.valueOf(-50.0)), "Depósito negativo");
         testarExcecao(() -> cc.depositar(null), "Depósito nulo");
-        testarExcecao(() -> cc.depositar(0.0), "Depósito zero");
+        testarExcecao(() -> cc.depositar(BigDecimal.valueOf(0.0)), "Depósito zero");
 
         // Saque
-        testarExcecao(() -> cc.sacar(200.0), "Saque além do limite");
+        testarExcecao(() -> cc.sacar(BigDecimal.valueOf(200.0)), "Saque além do limite");
 
         // Poupança
-        ContaPoupanca cp = new ContaPoupanca(2, 1, ana, 0.05);
-        testarExcecao(() -> cp.sacar(50.0), "Poupança sem saldo");
+        ContaPoupanca cp = new ContaPoupanca(2, 1, ana, BigDecimal.valueOf(0.05));
+        testarExcecao(() -> cp.sacar(BigDecimal.valueOf(50.0)), "Poupança sem saldo");
         testarExcecao(cp::renderJuros, "Rendimento sem saldo");
 
         // Transferência
-        cc.depositar(100.0);
-        testarExcecao(() -> cc.transferir(500.0, cp), "Transferência sem saldo");
-        testarExcecao(() -> cc.transferir(10.0, null), "Transferência para conta nula");
+        cc.depositar(BigDecimal.valueOf(100.0));
+        testarExcecao(() -> cc.transferir(BigDecimal.valueOf(500.0), cp), "Transferência sem saldo");
+        testarExcecao(() -> cc.transferir(BigDecimal.valueOf(10.0), null), "Transferência para conta nula");
 
         // Setters e Construtores - Conta Corrente
-        testarExcecao(() -> cc.setLimiteEspecial(-10.0), "Set limite especial negativo");
+        testarExcecao(() -> cc.setLimiteEspecial(BigDecimal.valueOf(-10.0)), "Set limite especial negativo");
         testarExcecao(() -> cc.setLimiteEspecial(null), "Set limite especial nulo");
-        testarExcecao(() -> cc.setTaxaManutencao(-5.0), "Set taxa manutenção negativa");
+        testarExcecao(() -> cc.setTaxaManutencao(BigDecimal.valueOf(-5.0)), "Set taxa manutenção negativa");
         testarExcecao(() -> cc.setTaxaManutencao(null), "Set taxa manutenção nula");
-        testarExcecao(() -> new ContaCorrente(4, 1, carlos, -100.0, 10.0), "Construtor ContaCorrente com limite negativo");
+        testarExcecao(() -> new ContaCorrente(4, 1, carlos, BigDecimal.valueOf(-100.0), BigDecimal.valueOf(10.0)), "Construtor ContaCorrente com limite negativo");
 
         // Setters e Construtores - Conta Poupança
-        testarExcecao(() -> cp.setTaxaRendimento(0.0), "Set taxa rendimento zero");
-        testarExcecao(() -> cp.setTaxaRendimento(-0.05), "Set taxa rendimento negativa");
+        testarExcecao(() -> cp.setTaxaRendimento(BigDecimal.valueOf(0.0)), "Set taxa rendimento zero");
+        testarExcecao(() -> cp.setTaxaRendimento(BigDecimal.valueOf(-0.05)), "Set taxa rendimento negativa");
         testarExcecao(() -> cp.setTaxaRendimento(null), "Set taxa rendimento nula");
-        testarExcecao(() -> new ContaPoupanca(5, 1, ana, -0.01), "Construtor ContaPoupanca com taxa negativa");
+        testarExcecao(() -> new ContaPoupanca(5, 1, ana, BigDecimal.valueOf(-0.01)), "Construtor ContaPoupanca com taxa negativa");
 
         // Taxa
-        ContaCorrente cc2 = new ContaCorrente(3, 1, carlos, 0.0, 0.0);
+        ContaCorrente cc2 = new ContaCorrente(3, 1, carlos, BigDecimal.valueOf(0.0), BigDecimal.valueOf(0.0));
         testarExcecao(cc2::cobrarTaxaManutencao, "Taxa de manutenção zerada");
 
         // Banco
@@ -56,7 +57,7 @@ public class Testes {
         banco.adicionarConta(cc);
 
         testarExcecao(() -> banco.adicionarConta(null), "Adicionar conta nula");
-        testarExcecao(() -> banco.adicionarConta(new ContaCorrente(1, 1, carlos, 50.0, 5.0)), "Adicionar conta com número duplicado");
+        testarExcecao(() -> banco.adicionarConta(new ContaCorrente(1, 1, carlos, BigDecimal.valueOf(50.0), BigDecimal.valueOf(5.0))), "Adicionar conta com número duplicado");
         testarExcecao(() -> banco.buscarConta(null), "Buscar conta com número nulo");
         testarExcecao(() -> banco.buscarConta(-10), "Buscar conta com número negativo");
         testarExcecao(() -> banco.buscarConta(999), "Buscar conta inexistente");

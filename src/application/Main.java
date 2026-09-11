@@ -9,6 +9,7 @@ import model.entities.ContaCorrente;
 import model.entities.ContaPoupanca;
 import model.entities.TipoCliente;
 import model.exceptions.DomainException;
+import java.math.BigDecimal;
 
 public class Main {
 
@@ -20,8 +21,8 @@ public class Main {
         Cliente joao = new Cliente("João Silva", "123.456.789-00", TipoCliente.PESSOA_FISICA);
         Cliente maria = new Cliente("Maria Souza", "987.654.321-00", TipoCliente.PESSOA_FISICA);
 
-        ContaCorrente ccJoao = new ContaCorrente(1001, 1, joao, 500.0, 20.0);
-        ContaPoupanca cpMaria = new ContaPoupanca(2001, 1, maria, 0.005);
+        ContaCorrente ccJoao = new ContaCorrente(1001, 1, joao, BigDecimal.valueOf(500.0), BigDecimal.valueOf(20.0));
+        ContaPoupanca cpMaria = new ContaPoupanca(2001, 1, maria, BigDecimal.valueOf(0.005));
 
         banco.adicionarConta(ccJoao);
         banco.adicionarConta(cpMaria);
@@ -32,16 +33,16 @@ public class Main {
         System.out.println("\n=== 2. REALIZANDO MOVIMENTAÇÕES ===");
 
         try {
-            ccJoao.depositar(1000.0);
-            cpMaria.depositar(2000.0);
+            ccJoao.depositar(BigDecimal.valueOf(1000.0));
+            cpMaria.depositar(BigDecimal.valueOf(2000.0));
 
-            ccJoao.sacar(1300.0);
+            ccJoao.sacar(BigDecimal.valueOf(1300.0));
             System.out.println("Saque de R$ 1300,00 realizado com sucesso na Conta Corrente.");
 
-            cpMaria.sacar(200.0);
+            cpMaria.sacar(BigDecimal.valueOf(200.0));
             System.out.println("Saque de R$ 200,00 realizado com sucesso na Conta Poupança.");
 
-            ccJoao.transferir(100.0, cpMaria);
+            ccJoao.transferir(BigDecimal.valueOf(100.0), cpMaria);
             cpMaria.renderJuros();
             ccJoao.cobrarTaxaManutencao();
 
