@@ -3,6 +3,7 @@ package model.entities;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
 
 public class Transacao {
 
