@@ -6,8 +6,10 @@ import java.util.List;
 
 import model.exceptions.SaldoInsuficienteException;
 import model.exceptions.ValorInvalidoException;
+import model.util.MonetarioConfig;
 
 public abstract class Conta {
+
     private Long id;
     private Integer numero;
     private Integer agencia;
@@ -17,14 +19,14 @@ public abstract class Conta {
     private List<Transacao> transacoes = new ArrayList<>();
 
     public Conta() {
-        this.saldo = BigDecimal.ZERO;
+        this.saldo = normalizar(BigDecimal.ZERO);
     }
 
     public Conta(Integer numero, Integer agencia, Cliente cliente) {
         this.numero = numero;
         this.agencia = agencia;
         this.titular = cliente;
-        this.saldo = BigDecimal.ZERO;
+        this.saldo = normalizar(BigDecimal.ZERO);
     }
 
     public void depositar(BigDecimal valor) {
@@ -34,8 +36,8 @@ public abstract class Conta {
         if (valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("O valor do depósito deve ser maior que zero.");
         }
-        this.saldo = this.saldo.add(valor);
-        adicionarTransacao(valor, TipoTransacao.DEPOSITO, "Depósito");
+        this.saldo = normalizar(this.saldo.add(valor));
+        adicionarTransacao(normalizar(valor), TipoTransacao.DEPOSITO, "Depósito");
     }
 
     public void sacar(BigDecimal valor) {
@@ -52,8 +54,8 @@ public abstract class Conta {
         if (valor.compareTo(saldo) > 0) {
             throw new SaldoInsuficienteException("Saldo insuficiente para realizar o saque.");
         }
-        this.saldo = this.saldo.subtract(valor);
-        adicionarTransacao(valor, tipo, descricao);
+        this.saldo = normalizar(this.saldo.subtract(valor));
+        adicionarTransacao(normalizar(valor), tipo, descricao);
     }
 
     public void transferir(BigDecimal valor, Conta destino) {
@@ -66,8 +68,12 @@ public abstract class Conta {
     }
 
     protected void adicionarTransacao(BigDecimal valor, TipoTransacao tipo, String desc) {
-        Transacao novaTransacao = new Transacao(valor, tipo, desc);
+        Transacao novaTransacao = new Transacao(normalizar(valor), tipo, desc);
         transacoes.add(novaTransacao);
+    }
+
+    public static BigDecimal normalizar(BigDecimal valor){
+        return valor.setScale(MonetarioConfig.SCALE, MonetarioConfig.ROUNDING_MODE);
     }
 
     public void imprimirExtrato() {
