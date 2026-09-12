@@ -20,21 +20,6 @@ public final class ContaPoupanca extends Conta {
         setTaxaRendimento(taxaRendimento);
     }
 
-    @Override
-    public void sacar(BigDecimal valor, TipoTransacao tipo, String descricao) {
-        if (valor == null) {
-            throw new ValorInvalidoException("O valor do saque não pode ser nulo.");
-        }
-        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ValorInvalidoException("O valor do saque deve ser maior que zero.");
-        }
-        if (valor.compareTo(saldo) > 0) {
-            throw new SaldoInsuficienteException("Saldo insuficiente para realizar o saque.");
-        }
-        saldo = normalizar(saldo.subtract(valor));
-        adicionarTransacao(valor, tipo, descricao);
-    }
-
     public void renderJuros() {
         if (taxaRendimento == null || taxaRendimento.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("A taxa de rendimento é inválida para aplicação de juros.");
