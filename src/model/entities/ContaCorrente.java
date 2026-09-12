@@ -11,8 +11,8 @@ public final class ContaCorrente extends Conta {
 
     public ContaCorrente() {
         super();
-        this.limiteEspecial = BigDecimal.ZERO;
-        this.taxaManutencao = BigDecimal.ZERO;
+        this.limiteEspecial = super.normalizar(BigDecimal.ZERO);
+        this.taxaManutencao = super.normalizar(BigDecimal.ZERO);
     }
 
     public ContaCorrente(Integer numero, Integer agencia, Cliente cliente, BigDecimal limiteEspecial,
@@ -33,7 +33,7 @@ public final class ContaCorrente extends Conta {
         if (valor.compareTo(saldo.add(limiteEspecial)) > 0) {
             throw new SaldoInsuficienteException("Saldo e limite especial insuficientes para realizar o saque.");
         }
-        saldo = saldo.subtract(valor);
+        saldo = normalizar(saldo.subtract(valor));
         adicionarTransacao(valor, tipo, descricao);
     }
 
@@ -55,7 +55,7 @@ public final class ContaCorrente extends Conta {
         if (limiteEspecial.compareTo(BigDecimal.ZERO) < 0) {
             throw new ValorInvalidoException("O limite especial não pode ser negativo.");
         }
-        this.limiteEspecial = limiteEspecial;
+        this.limiteEspecial = normalizar(limiteEspecial);
     }
    
     public BigDecimal getTaxaManutencao() {
@@ -69,7 +69,7 @@ public final class ContaCorrente extends Conta {
         if (taxaManutencao.compareTo(BigDecimal.ZERO) < 0) {
             throw new ValorInvalidoException("A taxa de manutenção não pode ser negativa.");
         }
-        this.taxaManutencao = taxaManutencao;
+        this.taxaManutencao = normalizar(taxaManutencao);
     }
 
     @Override
