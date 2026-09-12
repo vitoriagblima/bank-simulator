@@ -11,7 +11,7 @@ public final class ContaPoupanca extends Conta {
 
     public ContaPoupanca() {
         super();
-        this.taxaRendimento = BigDecimal.ZERO;
+        this.taxaRendimento = super.normalizar(BigDecimal.ZERO);
     }
 
     public ContaPoupanca(Integer numero, Integer agencia, Cliente cliente, BigDecimal taxaRendimento) {
@@ -30,7 +30,7 @@ public final class ContaPoupanca extends Conta {
         if (valor.compareTo(saldo) > 0) {
             throw new SaldoInsuficienteException("Saldo insuficiente para realizar o saque.");
         }
-        saldo = saldo.subtract(valor);
+        saldo = normalizar(saldo.subtract(valor));
         adicionarTransacao(valor, tipo, descricao);
     }
 
@@ -41,8 +41,8 @@ public final class ContaPoupanca extends Conta {
         if (saldo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new DomainException("Não é possível aplicar rendimentos em uma conta sem saldo positivo.");
         }
-        BigDecimal rendimento = saldo.multiply(taxaRendimento);
-        saldo = saldo.add(rendimento);
+        BigDecimal rendimento = normalizar(saldo.multiply(taxaRendimento));
+        saldo = normalizar(saldo.add(rendimento));
         adicionarTransacao(rendimento, TipoTransacao.RENDIMENTO, "Aplicação de rendimento");
     }
 
@@ -57,7 +57,7 @@ public final class ContaPoupanca extends Conta {
         if (taxaRendimento.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("A taxa de rendimento deve ser maior que zero.");
         }
-        this.taxaRendimento = taxaRendimento;
+        this.taxaRendimento = normalizar(taxaRendimento);
     }
 
     @Override
