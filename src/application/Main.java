@@ -22,7 +22,7 @@ public class Main {
         Cliente maria = new Cliente("Maria Souza", "987.654.321-00", TipoCliente.PESSOA_FISICA);
 
         ContaCorrente ccJoao = new ContaCorrente(1001, 1, joao, BigDecimal.valueOf(500.0), BigDecimal.valueOf(20.0));
-        ContaPoupanca cpMaria = new ContaPoupanca(2001, 1, maria, BigDecimal.valueOf(0.005));
+        ContaPoupanca cpMaria = new ContaPoupanca(2001, 1, maria, BigDecimal.valueOf(0.0050));
 
         banco.adicionarConta(ccJoao);
         banco.adicionarConta(cpMaria);
