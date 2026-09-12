@@ -3,7 +3,6 @@ package model.entities;
 import java.math.BigDecimal;
 
 import model.exceptions.DomainException;
-import model.exceptions.SaldoInsuficienteException;
 import model.exceptions.ValorInvalidoException;
 import model.util.MonetarioConfig;
 
