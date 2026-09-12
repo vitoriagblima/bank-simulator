@@ -5,13 +5,14 @@ import java.math.BigDecimal;
 import model.exceptions.DomainException;
 import model.exceptions.SaldoInsuficienteException;
 import model.exceptions.ValorInvalidoException;
+import model.util.MonetarioConfig;
 
 public final class ContaPoupanca extends Conta {
     private BigDecimal taxaRendimento;
 
     public ContaPoupanca() {
         super();
-        this.taxaRendimento = super.normalizar(BigDecimal.ZERO);
+        this.taxaRendimento = normalizarTaxa(BigDecimal.ZERO);
     }
 
     public ContaPoupanca(Integer numero, Integer agencia, Cliente cliente, BigDecimal taxaRendimento) {
@@ -41,9 +42,14 @@ public final class ContaPoupanca extends Conta {
         if (saldo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new DomainException("Não é possível aplicar rendimentos em uma conta sem saldo positivo.");
         }
-        BigDecimal rendimento = normalizar(saldo.multiply(taxaRendimento));
-        saldo = normalizar(saldo.add(rendimento));
-        adicionarTransacao(rendimento, TipoTransacao.RENDIMENTO, "Aplicação de rendimento");
+        BigDecimal valorRendimentoBruto = normalizarTaxa(saldo.multiply(taxaRendimento));
+        BigDecimal valorRendimentoFinal = normalizar(valorRendimentoBruto);
+        saldo = normalizar(saldo.add(valorRendimentoFinal));
+        adicionarTransacao(valorRendimentoFinal, TipoTransacao.RENDIMENTO, "Aplicação de rendimento");
+    }
+
+    public static BigDecimal normalizarTaxa(BigDecimal valor) {
+        return valor.setScale(MonetarioConfig.SCALE_TAXA, MonetarioConfig.ROUNDING_MODE);
     }
 
     public BigDecimal getTaxaRendimento() {
@@ -57,7 +63,7 @@ public final class ContaPoupanca extends Conta {
         if (taxaRendimento.compareTo(BigDecimal.ZERO) <= 0) {
             throw new ValorInvalidoException("A taxa de rendimento deve ser maior que zero.");
         }
-        this.taxaRendimento = normalizar(taxaRendimento);
+        this.taxaRendimento = normalizarTaxa(taxaRendimento);
     }
 
     @Override
@@ -66,7 +72,7 @@ public final class ContaPoupanca extends Conta {
                 " | Agência: " + getAgencia() +
                 " | Saldo: R$ " + String.format("%.2f", getSaldo()) +
                 " | Titular: " + getTitular().getNome() +
-                " | Taxa Rendimento: " + String.format("%.2f", getTaxaRendimento());
+                " | Taxa Rendimento: " + String.format("%.4f", getTaxaRendimento());
     }
 
 }
