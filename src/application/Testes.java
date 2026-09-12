@@ -61,6 +61,11 @@ public class Testes {
         testarExcecao(() -> banco.buscarConta(null), "Buscar conta com número nulo");
         testarExcecao(() -> banco.buscarConta(-10), "Buscar conta com número negativo");
         testarExcecao(() -> banco.buscarConta(999), "Buscar conta inexistente");
+
+        System.out.println("\n=== VALIDAÇÕES DE ARREDONDAMENTO BANCÁRIO (HALF_EVEN) E PRECISÃO ===");
+
+        BigDecimal taxaPar = ContaPoupanca.normalizarTaxa(new BigDecimal("0.00225"));
+        System.out.println("0.00225 -> Esperado: 0.0022 | Obtido: " + taxaPar + " -> " + ("0.0022".equals(taxaPar.toString()) ? "[OK]" : "[ERRO]"));
     }
 
     private static void testarExcecao(Runnable acao, String cenario) {
