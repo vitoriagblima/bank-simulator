@@ -77,7 +77,7 @@ public final class ContaCorrente extends Conta {
         return "Conta Corrente | Número: " + getNumero() +
                 " | Agência: " + getAgencia() +
                 " | Saldo: R$ " + String.format("%.2f", getSaldo()) +
-                " | Titular: " + getTitular().getNome() +
+                " | Titular: " + getCliente().getNome() +
                 " | Limite Especial: R$ " + String.format("%.2f", getLimiteEspecial()) +
                 " | Taxa Manutenção: R$ " + String.format("%.2f", getTaxaManutencao());
     }

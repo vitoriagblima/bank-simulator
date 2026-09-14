@@ -55,7 +55,7 @@ public final class ContaPoupanca extends Conta {
         return "Conta Poupança | Número: " + getNumero() +
                 " | Agência: " + getAgencia() +
                 " | Saldo: R$ " + String.format("%.2f", getSaldo()) +
-                " | Titular: " + getTitular().getNome() +
+                " | Titular: " + getCliente().getNome() +
                 " | Taxa Rendimento: " + String.format("%.4f", getTaxaRendimento());
     }
 
