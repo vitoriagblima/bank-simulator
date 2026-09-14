@@ -14,7 +14,7 @@ public abstract class Conta {
     private Integer numero;
     private Integer agencia;
     protected BigDecimal saldo;
-    private Cliente titular;
+    private Cliente cliente;
 
     private List<Transacao> transacoes = new ArrayList<>();
 
@@ -25,7 +25,7 @@ public abstract class Conta {
     public Conta(Integer numero, Integer agencia, Cliente cliente) {
         this.numero = numero;
         this.agencia = agencia;
-        this.titular = cliente;
+        this.cliente = cliente;
         this.saldo = normalizar(BigDecimal.ZERO);
     }
 
@@ -62,7 +62,7 @@ public abstract class Conta {
         if (destino == null) {
             throw new ValorInvalidoException("A conta a ser transferida não pode ser nula.");
         }
-        String descricao = "Transferência para " + destino.getTitular().getNome();
+        String descricao = "Transferência para " + destino.getCliente().getNome();
         this.sacar(valor, TipoTransacao.TRANSFERENCIA, descricao);
         destino.depositar(valor);
     }
@@ -98,13 +98,13 @@ public abstract class Conta {
         return this.saldo;
     }
 
-    public Cliente getTitular() {
-        return this.titular;
+    public Cliente getCliente() {
+        return this.cliente;
     }
 
     @Override
     public String toString() {
         return "Conta [numero=" + numero + ", agencia="
-                + agencia + ", saldo=" + saldo + ", titular=" + titular + "]";
+                + agencia + ", saldo=" + saldo + ", titular=" + cliente + "]";
     }
 }
