@@ -23,6 +23,15 @@ public abstract class Conta {
     }
 
     public Conta(Integer numero, Integer agencia, Cliente cliente) {
+        if (numero == null || numero <= 0){
+            throw new ValorInvalidoException("O número da conta não pode estar vazio e deve ser maior que zero.");
+        }
+        if (agencia == null || agencia <= 0){
+            throw new ValorInvalidoException("A agência da conta deve ser maior que zero.");
+        }
+        if (cliente == null){
+            throw new ValorInvalidoException("O cliente/titular da conta não pode ser nulo");
+        }
         this.numero = numero;
         this.agencia = agencia;
         this.cliente = cliente;
