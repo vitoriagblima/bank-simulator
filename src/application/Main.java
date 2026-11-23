@@ -1,70 +1,79 @@
 package application;
 
+import java.math.BigDecimal;
 import java.util.TimeZone;
 
 import model.entities.Banco;
 import model.entities.Cliente;
-import model.entities.Conta;
 import model.entities.ContaCorrente;
 import model.entities.ContaPoupanca;
 import model.entities.TipoCliente;
 import model.exceptions.DomainException;
-import java.math.BigDecimal;
 
 public class Main {
 
     public static void main(String[] args) {
 
         TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
+
         Banco banco = new Banco("Banco Java");
 
         Cliente joao = new Cliente("João Silva", "123.456.789-00", TipoCliente.PESSOA_FISICA);
         Cliente maria = new Cliente("Maria Souza", "987.654.321-00", TipoCliente.PESSOA_FISICA);
 
-        ContaCorrente ccJoao = new ContaCorrente(1001, 1, joao, BigDecimal.valueOf(500.0), BigDecimal.valueOf(20.0));
-        ContaPoupanca cpMaria = new ContaPoupanca(2001, 1, maria, BigDecimal.valueOf(0.0050));
+        ContaCorrente ccJoao = new ContaCorrente(1001, 1, joao, new BigDecimal("500.00"), new BigDecimal("20.00"));
+        ContaPoupanca cpMaria = new ContaPoupanca(2001, 1, maria, new BigDecimal("0.0050"));
 
         banco.adicionarConta(ccJoao);
         banco.adicionarConta(cpMaria);
 
-        System.out.println("=== 1. CONTAS RECÉM-CRIADAS (SALDO INICIAL) ===");
+        secao("1. CONTAS RECÉM-CRIADAS");
         banco.listarContas();
 
-        System.out.println("\n=== 2. REALIZANDO MOVIMENTAÇÕES ===");
+        // Cada operação é executada isoladamente: um erro não interrompe a simulação.
+        secao("2. MOVIMENTAÇÕES");
+        executar("Depósito de R$ 1.000,00 na conta corrente",
+                () -> ccJoao.depositar(new BigDecimal("1000.00")));
+        executar("Depósito de R$ 2.000,00 na poupança",
+                () -> cpMaria.depositar(new BigDecimal("2000.00")));
+        executar("Saque de R$ 1.300,00 na conta corrente (usa limite especial)",
+                () -> ccJoao.sacar(new BigDecimal("1300.00")));
+        executar("Saque de R$ 200,00 na poupança",
+                () -> cpMaria.sacar(new BigDecimal("200.00")));
+        executar("Transferência de R$ 100,00 de João para Maria",
+                () -> ccJoao.transferir(new BigDecimal("100.00"), cpMaria));
+        executar("Aplicação de rendimento na poupança",
+                cpMaria::renderJuros);
+        executar("Cobrança de taxa de manutenção na conta corrente",
+                ccJoao::cobrarTaxaManutencao);
+        executar("Saque de R$ 5.000,00 na poupança (erro esperado)",
+                () -> cpMaria.sacar(new BigDecimal("5000.00")));
 
-        try {
-            ccJoao.depositar(BigDecimal.valueOf(1000.0));
-            cpMaria.depositar(BigDecimal.valueOf(2000.0));
-
-            ccJoao.sacar(BigDecimal.valueOf(1300.0));
-            System.out.println("Saque de R$ 1300,00 realizado com sucesso na Conta Corrente.");
-
-            cpMaria.sacar(BigDecimal.valueOf(200.0));
-            System.out.println("Saque de R$ 200,00 realizado com sucesso na Conta Poupança.");
-
-            ccJoao.transferir(BigDecimal.valueOf(100.0), cpMaria);
-            cpMaria.renderJuros();
-            ccJoao.cobrarTaxaManutencao();
-
-        } catch (DomainException e) {
-            System.out.println("Erro na operação bancária: " + e.getMessage());
-        }
-
-        System.out.println("\n=== 3. SALDOS FINAIS COM TIPO DE CONTA ===");
+        secao("3. SALDOS FINAIS");
         System.out.println(ccJoao);
         System.out.println(cpMaria);
 
-        System.out.println("\n=== 4. EXTRATO - CONTA CORRENTE (JOÃO) ===");
+        secao("4. EXTRATO - CONTA CORRENTE (JOÃO)");
         ccJoao.imprimirExtrato();
 
-        System.out.println("\n=== 5. EXTRATO - CONTA POUPANÇA (MARIA) ===");
+        secao("5. EXTRATO - CONTA POUPANÇA (MARIA)");
         cpMaria.imprimirExtrato();
 
-        System.out.println("\n=== 6. BUSCA DE CONTA PELO NÚMERO ===");
-        Conta busca1 = banco.buscarConta(1001);
-        System.out.println(busca1);
+        secao("6. BUSCA DE CONTA PELO NÚMERO");
+        executar("Buscar conta 1001", () -> System.out.println(banco.buscarConta(1001)));
+        executar("Buscar conta 9999 (erro esperado)", () -> banco.buscarConta(9999));
+    }
 
-        Conta busca2 = banco.buscarConta(2001);
-        System.out.println(busca2);
+    private static void secao(String titulo) {
+        System.out.println("\n=== " + titulo + " ===");
+    }
+
+    private static void executar(String descricao, Runnable operacao) {
+        try {
+            operacao.run();
+            System.out.println("[OK]   " + descricao);
+        } catch (DomainException e) {
+            System.out.println("[ERRO] " + descricao + " -> " + e.getMessage());
+        }
     }
 }
