@@ -7,6 +7,7 @@ import model.exceptions.ValorInvalidoException;
 import model.util.MonetarioConfig;
 
 public final class ContaPoupanca extends Conta {
+
     private BigDecimal taxaRendimento;
 
     public ContaPoupanca() {
@@ -19,17 +20,28 @@ public final class ContaPoupanca extends Conta {
         setTaxaRendimento(taxaRendimento);
     }
 
+    @Override
+    public String getTipoConta() {
+        return "Conta Poupança";
+    }
+
     public void renderJuros() {
-        if (taxaRendimento == null || taxaRendimento.compareTo(BigDecimal.ZERO) <= 0) {
+        if (taxaRendimento == null || taxaRendimento.signum() <= 0) {
             throw new ValorInvalidoException("A taxa de rendimento é inválida para aplicação de juros.");
         }
-        if (saldo.compareTo(BigDecimal.ZERO) <= 0) {
+        if (getSaldo().signum() <= 0) {
             throw new DomainException("Não é possível aplicar rendimentos em uma conta sem saldo positivo.");
         }
-        BigDecimal valorRendimentoBruto = normalizarTaxa(saldo.multiply(taxaRendimento));
-        BigDecimal valorRendimentoFinal = normalizar(valorRendimentoBruto);
-        saldo = normalizar(saldo.add(valorRendimentoFinal));
-        adicionarTransacao(valorRendimentoFinal, TipoTransacao.RENDIMENTO, "Aplicação de rendimento");
+        // Arredondamento único: saldo x taxa é arredondado direto para centavos.
+        // (Antes, arredondava para 4 casas e depois para 2, o que gerava erro de arredondamento.)
+        BigDecimal rendimento = getSaldo()
+                .multiply(taxaRendimento)
+                .setScale(MonetarioConfig.SCALE, MonetarioConfig.ROUNDING_MODE);
+
+        if (rendimento.signum() == 0) {
+            return; // rendimento menor que um centavo: nada a creditar
+        }
+        creditar(rendimento, TipoTransacao.RENDIMENTO, "Aplicação de rendimento");
     }
 
     public static BigDecimal normalizarTaxa(BigDecimal valor) {
@@ -44,7 +56,7 @@ public final class ContaPoupanca extends Conta {
         if (taxaRendimento == null) {
             throw new ValorInvalidoException("A taxa de rendimento não pode ser nula.");
         }
-        if (taxaRendimento.compareTo(BigDecimal.ZERO) <= 0) {
+        if (taxaRendimento.signum() <= 0) {
             throw new ValorInvalidoException("A taxa de rendimento deve ser maior que zero.");
         }
         this.taxaRendimento = normalizarTaxa(taxaRendimento);
@@ -52,11 +64,7 @@ public final class ContaPoupanca extends Conta {
 
     @Override
     public String toString() {
-        return "Conta Poupança | Número: " + getNumero() +
-                " | Agência: " + getAgencia() +
-                " | Saldo: R$ " + String.format("%.2f", getSaldo()) +
-                " | Titular: " + getCliente().getNome() +
-                " | Taxa Rendimento: " + String.format("%.4f", getTaxaRendimento());
+        return super.toString() +
+                " | Taxa Rendimento: " + MonetarioConfig.formatarPercentual(taxaRendimento);
     }
-
 }
