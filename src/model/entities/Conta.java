@@ -2,6 +2,7 @@ package model.entities;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import model.exceptions.SaldoInsuficienteException;
@@ -13,24 +14,24 @@ public abstract class Conta {
     private Long id;
     private Integer numero;
     private Integer agencia;
-    protected BigDecimal saldo;
+    private BigDecimal saldo;
     private Cliente cliente;
 
-    private List<Transacao> transacoes = new ArrayList<>();
+    private final List<Transacao> transacoes = new ArrayList<>();
 
     public Conta() {
         this.saldo = normalizar(BigDecimal.ZERO);
     }
 
     public Conta(Integer numero, Integer agencia, Cliente cliente) {
-        if (numero == null || numero <= 0){
+        if (numero == null || numero <= 0) {
             throw new ValorInvalidoException("O número da conta não pode estar vazio e deve ser maior que zero.");
         }
-        if (agencia == null || agencia <= 0){
+        if (agencia == null || agencia <= 0) {
             throw new ValorInvalidoException("A agência da conta deve ser maior que zero.");
         }
-        if (cliente == null){
-            throw new ValorInvalidoException("O cliente/titular da conta não pode ser nulo");
+        if (cliente == null) {
+            throw new ValorInvalidoException("O cliente/titular da conta não pode ser nulo.");
         }
         this.numero = numero;
         this.agencia = agencia;
@@ -38,58 +39,89 @@ public abstract class Conta {
         this.saldo = normalizar(BigDecimal.ZERO);
     }
 
+    // ===================== Operações públicas =====================
+
     public void depositar(BigDecimal valor) {
-        if (valor == null) {
-            throw new ValorInvalidoException("O valor do depósito não pode ser nulo.");
-        }
-        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ValorInvalidoException("O valor do depósito deve ser maior que zero.");
-        }
-        this.saldo = normalizar(this.saldo.add(valor));
-        adicionarTransacao(normalizar(valor), TipoTransacao.DEPOSITO, "Depósito");
+        creditar(valor, TipoTransacao.DEPOSITO, "Depósito");
     }
 
     public void sacar(BigDecimal valor) {
-        sacar(valor, TipoTransacao.SAQUE, "Saque");
-    }
-
-    public void sacar(BigDecimal valor, TipoTransacao tipo, String descricao) {
-        if (valor == null) {
-            throw new ValorInvalidoException("O valor do saque não pode ser nulo.");
-        }
-        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ValorInvalidoException("O valor do saque deve ser maior que zero.");
-        }
-        if (valor.compareTo(saldo) > 0) {
-            throw new SaldoInsuficienteException("Saldo insuficiente para realizar o saque.");
-        }
-        this.saldo = normalizar(this.saldo.subtract(valor));
-        adicionarTransacao(normalizar(valor), tipo, descricao);
+        debitar(valor, TipoTransacao.SAQUE, "Saque");
     }
 
     public void transferir(BigDecimal valor, Conta destino) {
         if (destino == null) {
-            throw new ValorInvalidoException("A conta a ser transferida não pode ser nula.");
+            throw new ValorInvalidoException("A conta de destino não pode ser nula.");
         }
-        String descricao = "Transferência para " + destino.getCliente().getNome();
-        this.sacar(valor, TipoTransacao.TRANSFERENCIA, descricao);
-        destino.depositar(valor);
+        if (destino == this) {
+            throw new ValorInvalidoException("Não é possível transferir para a própria conta.");
+        }
+        validarValor(valor);
+
+        debitar(valor, TipoTransacao.TRANSFERENCIA, "Transferência para " + destino.getCliente().getNome());
+        destino.creditar(valor, TipoTransacao.TRANSFERENCIA_RECEBIDA,
+                "Transferência recebida de " + this.cliente.getNome());
     }
 
-    protected void adicionarTransacao(BigDecimal valor, TipoTransacao tipo, String desc) {
-        Transacao novaTransacao = new Transacao(normalizar(valor), tipo, desc);
-        transacoes.add(novaTransacao);
+    // ===================== Núcleo das operações =====================
+    // Protegidos: só a própria hierarquia de contas pode movimentar saldo diretamente.
+
+    protected void creditar(BigDecimal valor, TipoTransacao tipo, String descricao) {
+        validarValor(valor);
+        this.saldo = normalizar(this.saldo.add(valor));
+        adicionarTransacao(valor, tipo, descricao);
     }
 
-    public static BigDecimal normalizar(BigDecimal valor){
+    protected void debitar(BigDecimal valor, TipoTransacao tipo, String descricao) {
+        validarValor(valor);
+        if (valor.compareTo(saldoDisponivel()) > 0) {
+            throw new SaldoInsuficienteException(mensagemSaldoInsuficiente());
+        }
+        this.saldo = normalizar(this.saldo.subtract(valor));
+        adicionarTransacao(valor, tipo, descricao);
+    }
+
+    /** Valor que pode ser sacado. Subclasses podem ampliar (ex.: limite especial). */
+    protected BigDecimal saldoDisponivel() {
+        return this.saldo;
+    }
+
+    protected String mensagemSaldoInsuficiente() {
+        return "Saldo insuficiente para realizar a operação.";
+    }
+
+    protected void adicionarTransacao(BigDecimal valor, TipoTransacao tipo, String descricao) {
+        transacoes.add(new Transacao(normalizar(valor), tipo, descricao));
+    }
+
+    private static void validarValor(BigDecimal valor) {
+        if (valor == null) {
+            throw new ValorInvalidoException("O valor da operação não pode ser nulo.");
+        }
+        if (valor.signum() <= 0) {
+            throw new ValorInvalidoException("O valor da operação deve ser maior que zero.");
+        }
+    }
+
+    public static BigDecimal normalizar(BigDecimal valor) {
         return valor.setScale(MonetarioConfig.SCALE, MonetarioConfig.ROUNDING_MODE);
     }
 
-    public void imprimirExtrato() {
-        for (Transacao t : transacoes) {
-            System.out.println(t);
-        }
+    // ===================== Consultas =====================
+
+    public List<Transacao> getTransacoes() {
+        return Collections.unmodifiableList(transacoes);
     }
+
+    public void imprimirExtrato() {
+        if (transacoes.isEmpty()) {
+            System.out.println("Nenhuma movimentação registrada.");
+            return;
+        }
+        transacoes.forEach(System.out::println);
+    }
+
+    public abstract String getTipoConta();
 
     public Long getId() {
         return this.id;
@@ -113,7 +145,10 @@ public abstract class Conta {
 
     @Override
     public String toString() {
-        return "Conta [numero=" + numero + ", agencia="
-                + agencia + ", saldo=" + saldo + ", titular=" + cliente + "]";
+        return getTipoConta() +
+                " | Número: " + numero +
+                " | Agência: " + agencia +
+                " | Saldo: " + MonetarioConfig.formatar(saldo) +
+                " | Titular: " + cliente.getNome();
     }
 }
