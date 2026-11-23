@@ -51,7 +51,7 @@ public class Banco {
                     " | Número da Conta: " + c.getNumero() +
                     " | Agência: " + c.getAgencia() +
                     " | Saldo: R$ " + String.format("%.2f", c.getSaldo()) +
-                    " | Cliente: " + c.getTitular().getNome());
+                    " | Cliente: " + c.getCliente().getNome());
         }
     }
 
