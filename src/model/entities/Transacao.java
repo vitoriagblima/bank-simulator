@@ -1,19 +1,21 @@
 package model.entities;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.math.BigDecimal;
+
+import model.util.MonetarioConfig;
 
 public class Transacao {
+
+    private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private Long id;
     private ZonedDateTime dataHora;
     private BigDecimal valor;
     private TipoTransacao tipo;
     private String descricao;
-
-    private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public Transacao() {
         this.dataHora = ZonedDateTime.now(ZoneId.systemDefault());
@@ -46,9 +48,11 @@ public class Transacao {
         return this.descricao;
     }
 
+    @Override
     public String toString() {
-        String dataFormatada = this.dataHora.format(FORMATADOR);
-        return "Transacao: " + this.tipo + " | Data hora: " + dataFormatada + " | Valor: " +
-                String.format("%.2f", getValor()) + " | Descricao: " + this.descricao;
+        return "Transação: " + tipo +
+                " | Data/hora: " + dataHora.format(FORMATADOR) +
+                " | Valor: " + MonetarioConfig.formatar(valor) +
+                " | Descrição: " + descricao;
     }
 }
