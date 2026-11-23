@@ -27,10 +27,10 @@ public class Cliente {
     }
 
     public void setNome(String nome) {
-        if (nome == null || nome.trim().isEmpty()){
+        if (nome == null || nome.isBlank()) {
             throw new ValorInvalidoException("O nome do cliente não pode ser nulo ou vazio.");
         }
-        this.nome = nome;
+        this.nome = nome.trim();
     }
 
     public String getDocumento() {
@@ -38,10 +38,10 @@ public class Cliente {
     }
 
     public void setDocumento(String documento) {
-        if (documento == null || documento.trim().isEmpty()){
+        if (documento == null || documento.isBlank()) {
             throw new ValorInvalidoException("O documento do cliente não pode ser nulo ou vazio.");
         }
-        this.documento = documento;
+        this.documento = documento.trim();
     }
 
     public TipoCliente getTipoCliente() {
@@ -49,14 +49,14 @@ public class Cliente {
     }
 
     public void setTipoCliente(TipoCliente tipoCliente) {
-        if (tipoCliente == null){
+        if (tipoCliente == null) {
             throw new ValorInvalidoException("O tipo do cliente deve ser preenchido.");
         }
         this.tipoCliente = tipoCliente;
     }
 
+    @Override
     public String toString() {
-        return "Cliente: " + this.nome + " | Documento: " 
-        + this.documento + " | Tipo: " + this.tipoCliente;
+        return "Cliente: " + nome + " | Documento: " + documento + " | Tipo: " + tipoCliente;
     }
 }
