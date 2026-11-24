@@ -1,29 +1,69 @@
-package model.entities;
+package com.bancojava.simulador.model;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import model.exceptions.SaldoInsuficienteException;
-import model.exceptions.ValorInvalidoException;
-import model.util.MonetarioConfig;
+import com.bancojava.simulador.exception.SaldoInsuficienteException;
+import com.bancojava.simulador.exception.ValorInvalidoException;
+import com.bancojava.simulador.util.MonetarioConfig;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+
+@Entity
+@Table(name = "contas")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_conta", discriminatorType = DiscriminatorType.STRING)
 public abstract class Conta {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
     private Integer numero;
+
+    @Column(nullable = false)
     private Integer agencia;
+
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal saldo;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    private final List<Transacao> transacoes = new ArrayList<>();
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    private List<Transacao> transacoes = new ArrayList<>();
 
-    public Conta() {
+    /** Controle de concorrência otimista: evita perda de atualização em operações simultâneas. */
+    @Version
+    private Long versao;
+
+    /** Construtor exigido pelo JPA. */
+    protected Conta() {
         this.saldo = normalizar(BigDecimal.ZERO);
     }
 
-    public Conta(Integer numero, Integer agencia, Cliente cliente) {
+    protected Conta(Integer numero, Integer agencia, Cliente cliente) {
         if (numero == null || numero <= 0) {
             throw new ValorInvalidoException("O número da conta não pode estar vazio e deve ser maior que zero.");
         }
@@ -53,7 +93,7 @@ public abstract class Conta {
         if (destino == null) {
             throw new ValorInvalidoException("A conta de destino não pode ser nula.");
         }
-        if (destino == this) {
+        if (destino == this || destino.getNumero().equals(this.numero)) {
             throw new ValorInvalidoException("Não é possível transferir para a própria conta.");
         }
         validarValor(valor);
@@ -64,7 +104,7 @@ public abstract class Conta {
     }
 
     // ===================== Núcleo das operações =====================
-    // Protegidos: só a própria hierarquia de contas pode movimentar saldo diretamente.
+    // Protegidos: só a própria hierarquia de contas movimenta saldo diretamente.
 
     protected void creditar(BigDecimal valor, TipoTransacao tipo, String descricao) {
         validarValor(valor);
@@ -91,7 +131,7 @@ public abstract class Conta {
     }
 
     protected void adicionarTransacao(BigDecimal valor, TipoTransacao tipo, String descricao) {
-        transacoes.add(new Transacao(normalizar(valor), tipo, descricao));
+        transacoes.add(new Transacao(this, normalizar(valor), tipo, descricao));
     }
 
     private static void validarValor(BigDecimal valor) {
@@ -113,34 +153,26 @@ public abstract class Conta {
         return Collections.unmodifiableList(transacoes);
     }
 
-    public void imprimirExtrato() {
-        if (transacoes.isEmpty()) {
-            System.out.println("Nenhuma movimentação registrada.");
-            return;
-        }
-        transacoes.forEach(System.out::println);
-    }
-
     public abstract String getTipoConta();
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public Integer getNumero() {
-        return this.numero;
+        return numero;
     }
 
     public Integer getAgencia() {
-        return this.agencia;
+        return agencia;
     }
 
     public BigDecimal getSaldo() {
-        return this.saldo;
+        return saldo;
     }
 
     public Cliente getCliente() {
-        return this.cliente;
+        return cliente;
     }
 
     @Override

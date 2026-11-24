@@ -1,247 +1,199 @@
 # Bank Simulator
 
-![Java](https://img.shields.io/badge/Java-11%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
-![POO](https://img.shields.io/badge/POO-Programação%20Orientada%20a%20Objetos-212121?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-212121?style=for-the-badge)
+![Java](https://img.shields.io/badge/Java-Backend-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Framework-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-Build%20Tool-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
+![JPA](https://img.shields.io/badge/Spring%20Data%20JPA-Persistence-6DB33F?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-orange?style=for-the-badge)
 
-| Camada                | Tecnologia                  | Status no Projeto            |
-| --------------------- | ---------------------------- | ---------------------------- |
-| Linguagem & Paradigma | Java 11+ / POO              | 🟢 Concluído (em refinamento) |
-| Gerenciador de Build  | Apache Maven                | 🟡 Próxima etapa              |
-| Framework Web         | Spring Boot (REST)          | ⚪ Planejado                  |
-| Persistência de Dados | Spring Data JPA / Hibernate | ⚪ Planejado                  |
-| Banco de Dados        | H2 Database (em memória)    | ⚪ Planejado                  |
+## Sobre o projeto
 
----
+O **Bank Simulator** é uma aplicação de simulação bancária desenvolvida em Java, com foco na aplicação de conceitos de Programação Orientada a Objetos, arquitetura de software e desenvolvimento backend.
 
-Simulador de operações bancárias desenvolvido em **Java puro**, criado como projeto de estudo para consolidar os **fundamentos da Programação Orientada a Objetos (POO)**.
+O projeto iniciou como uma aplicação Java puro e evoluiu para uma arquitetura baseada em **Spring Boot e Maven**, incorporando conceitos de desenvolvimento de APIs REST, organização em camadas e persistência de dados.
 
-> **Nota de evolução:** Este repositório registra meu aprendizado prático e incremental. Esta primeira versão em Java puro passa por constantes refatorações à medida que consolido boas práticas de código, servindo como base para a próxima versão oficial com Maven e Spring.
+Essa evolução representa uma nova etapa do projeto, buscando maior organização, escalabilidade, manutenção e aplicação de boas práticas de desenvolvimento.
 
-## Fundamentos de Java e POO praticados
+## Evolução do projeto
 
-| Conceito                                | Onde aparece no projeto                                                                                                                                                                                                     |
-| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Abstração**                           | `Conta` define o comportamento comum a qualquer tipo de conta (depositar, sacar, transferir, extrato), escondendo os detalhes específicos de cada subtipo.                                                                  |
-| **Herança**                             | `ContaCorrente` e `ContaPoupanca` estendem `Conta`, reaproveitando atributos e comportamentos da superclasse.                                                                                                               |
-| **Polimorfismo**                        | O método `sacar(BigDecimal, TipoTransacao, String)` é sobrescrito (`@Override`) em `ContaCorrente`, que passa a considerar o limite especial. `ContaPoupanca` não sobrescreve o método — usa a versão da superclasse, sem limite adicional. O `Banco` manipula qualquer conta como `Conta`, sem saber o tipo concreto. |
-| **Encapsulamento**                      | Atributos como `saldo`, `numero` e `titular` são privados/protegidos, expostos apenas via getters e métodos de comportamento (`depositar`, `sacar`), nunca alterados diretamente de fora da classe.                         |
-| **Sobrecarga de métodos (overloading)** | `sacar(BigDecimal valor)` e `sacar(BigDecimal valor, TipoTransacao tipo, String descricao)` na classe `Conta`.                                                                                                              |
-| **Classes `final`**                     | `ContaCorrente` e `ContaPoupanca` são `final`, impedindo novas heranças a partir delas — uma decisão de design proposital.                                                                                                  |
-| **Enums**                               | `TipoCliente` e `TipoTransacao` substituem "strings mágicas" por tipos seguros e expressivos.                                                                                                                               |
-| **Composição**                          | `Conta` possui um `Cliente` (titular) e uma lista de `Transacao`; `Banco` possui uma lista de `Conta`. Relações "tem-um" em vez de herança.                                                                                 |
-| **Coleções (`List`/`ArrayList`)**       | Usadas em `Banco` (lista de contas) e `Conta` (histórico de transações).                                                                                                                                                    |
-| **Sobrescrita de `toString()`**         | Cada entidade define sua própria representação textual, facilitando debug e exibição no console.                                                                                                                            |
-| **Construtores default e customizados** | Todas as entidades possuem construtor vazio e construtor com parâmetros, facilitando a evolução futura do modelo para frameworks de persistência.                                                                           |
-| **Data e hora (`java.time`)**           | `Transacao` usa `ZonedDateTime` para registrar o momento de cada operação, já considerando fuso horário.                                                                                                                     |
-| **Precisão decimal (`java.math`)**      | Valores monetários usam `BigDecimal` (nunca `double`/`Double`), com escala e modo de arredondamento centralizados em `MonetarioConfig` (`HALF_EVEN`, o chamado "arredondamento bancário").                                  |
-| **Exceções de domínio**                 | `DomainException` (classe-base) e as especializações `ValorInvalidoException` e `SaldoInsuficienteException`, no pacote `model.exceptions`, protegem as regras de negócio das entidades.                                    |
-| **Separação em pacotes**                | `application` (ponto de entrada), `model.entities` (modelo de domínio), `model.exceptions` (exceções de negócio) e `model.util` (configurações compartilhadas, como `MonetarioConfig`) — antecipando a separação em camadas que o Spring exigirá futuramente (`controller`, `service`, `repository`, `entity`). |
+O desenvolvimento foi dividido em duas etapas principais:
 
-## Estrutura do projeto
+**Versão 1 — Java puro**
+- Estrutura baseada em Programação Orientada a Objetos.
+- Modelagem de entidades bancárias.
+- Implementação de regras de negócio.
+- Organização das responsabilidades da aplicação.
 
-```text
-bank-simulator/
-└── src/
-    ├── application/
-    │   ├── Main.java                    # Ponto de entrada (simula operações no console)
-    │   └── Testes.java                  # Cenários de exceção e validação (console)
-    └── model/
-        ├── entities/
-        │   ├── Banco.java               # Agrega e gerencia as contas
-        │   ├── Cliente.java             # Titular da conta
-        │   ├── Conta.java               # Classe base/abstrata do domínio
-        │   ├── ContaCorrente.java       # Conta com limite especial e taxa de manutenção
-        │   ├── ContaPoupanca.java       # Conta com rendimento por juros
-        │   ├── Transacao.java           # Registro de cada movimentação
-        │   ├── TipoCliente.java         # Enum: PESSOA_FISICA, PESSOA_JURIDICA
-        │   └── TipoTransacao.java       # Enum: DEPOSITO, SAQUE, TRANSFERENCIA, TAXA_MANUTENCAO, RENDIMENTO
-        ├── exceptions/
-        │   ├── DomainException.java             # Exceção-base de regras de negócio
-        │   ├── ValorInvalidoException.java      # Valores nulos, negativos ou zerados quando não permitido
-        │   └── SaldoInsuficienteException.java  # Saldo (ou saldo + limite) insuficiente para saque/transferência
-        └── util/
-            └── MonetarioConfig.java      # Escala e modo de arredondamento (BigDecimal) usados em todo o domínio
-```
+**Versão 2 — Spring Boot e Maven**
+- Migração para uma arquitetura backend.
+- Organização em camadas.
+- Desenvolvimento com Spring Boot.
+- Gerenciamento de dependências com Maven.
+- Integração com Spring Data JPA e Hibernate.
+- Utilização de banco de dados H2.
+- Estruturação de endpoints REST.
+- Organização de DTOs e tratamento de exceções.
 
-## Funcionalidades atuais
+## Tecnologias utilizadas
 
-- Criar clientes (pessoa física/jurídica)
-- Criar contas correntes (com limite especial e taxa de manutenção) e contas poupança (com rendimento)
-- Depositar, sacar e transferir valores entre contas, com valores em `BigDecimal`
-- Cobrar taxa de manutenção (conta corrente) e render juros (conta poupança)
-- Registrar e imprimir extrato de transações por conta
-- Buscar conta pelo número através do `Banco`
-- Validar regras de negócio via exceções de domínio (`DomainException` e subclasses), cobertas em `Testes.java`
+| Tecnologia | Finalidade |
+|---|---|
+| Java | Linguagem de programação |
+| Spring Boot | Framework para desenvolvimento backend |
+| Apache Maven | Gerenciamento de dependências e build |
+| Spring Data JPA | Persistência e acesso a dados |
+| Hibernate | Mapeamento objeto-relacional (ORM) |
+| H2 Database | Banco de dados para desenvolvimento |
+| REST API | Comunicação e exposição de recursos |
+| Swagger / Springdoc | Documentação da API |
+| JUnit | Testes automatizados |
 
+## Arquitetura do projeto
 
-## Exemplo de Execução (Console)
+A aplicação utiliza uma arquitetura organizada em camadas, buscando separar responsabilidades e facilitar a manutenção e evolução do código.
 
-Ao executar a classe **Main.java**, a aplicação simula o ciclo de vida completo das operações bancárias:
+### Organização dos pacotes
 
-```text
-=== 1. CONTAS RECÉM-CRIADAS (SALDO INICIAL) ===
-Tipo: ContaCorrente | Número da Conta: 1001 | Agência: 1 | Saldo: R$ 0.00 | Cliente: João Silva
-Tipo: ContaPoupanca | Número da Conta: 2001 | Agência: 1 | Saldo: R$ 0.00 | Cliente: Maria Souza
+| Pacote | Responsabilidade |
+|---|---|
+| `config` | Configurações da aplicação |
+| `controller` | Recebimento e gerenciamento das requisições HTTP |
+| `dto` | Transferência de dados entre as camadas |
+| `exception` | Exceções e tratamento de erros |
+| `model` | Entidades e representação do domínio bancário |
+| `repository` | Acesso e persistência de dados |
+| `service` | Implementação das regras de negócio |
+| `util` | Classes auxiliares e utilitários |
 
-=== 2. REALIZANDO MOVIMENTAÇÕES ===
-Saque de R$ 1300,00 na Conta Corrente: true
-Saque de R$ 200,00 na Conta Poupança: true
+## Conceitos aplicados
 
-=== 3. SALDOS FINAIS COM TIPO DE CONTA ===
-Conta Corrente | Número: 1001 | Agência: 1 | Saldo: R$ -420.00 | Titular: João Silva | Limite Especial: R$ 500.00 | Taxa Manutenção: R$ 20.00
-Conta Poupança | Número: 2001 | Agência: 1 | Saldo: R$ 1909.50 | Titular: Maria Souza | Taxa Rendimento: 0.005
+Durante o desenvolvimento, são trabalhados conceitos importantes da engenharia de software:
 
-=== 4. EXTRATO - CONTA CORRENTE (JOÃO) ===
-Transacao: DEPOSITO | Data hora: 08/09/2026 10:50:05 | Valor: 1000.0 | Descricao: Depósito
-Transacao: SAQUE | Data hora: 08/09/2026 10:50:05 | Valor: 1300.0 | Descricao: Saque
-Transacao: TRANSFERENCIA | Data hora: 08/09/2026 10:50:05 | Valor: 100.0 | Descricao: Transferência para Maria Souza
-Transacao: TAXA_MANUTENCAO | Data hora: 08/09/2026 10:50:05 | Valor: 20.0 | Descricao: Cobrança de taxa de manutenção
+- Programação Orientada a Objetos (POO).
+- Encapsulamento e abstração.
+- Separação de responsabilidades.
+- Arquitetura em camadas.
+- Desenvolvimento de APIs REST.
+- Transferência de dados com DTOs.
+- Persistência e mapeamento objeto-relacional.
+- Injeção de dependências.
+- Tratamento centralizado de exceções.
+- Validação de regras de negócio.
+- Testes automatizados.
+- Controle de versão com Git.
 
-=== 5. EXTRATO - CONTA POUPANÇA (MARIA) ===
-Transacao: DEPOSITO | Data hora: 08/09/2026 10:50:05 | Valor: 2000.0 | Descricao: Depósito
-Transacao: SAQUE | Data hora: 08/09/2026 10:50:05 | Valor: 200.0 | Descricao: Saque
-Transacao: DEPOSITO | Data hora: 08/09/2026 10:50:05 | Valor: 100.0 | Descricao: Depósito
-Transacao: RENDIMENTO | Data hora: 08/09/2026 10:50:05 | Valor: 9.5 | Descricao: Aplicação de rendimento
+## Funcionalidades e domínio bancário
 
-=== 6. BUSCA DE CONTA PELO NÚMERO ===
-Conta Corrente | Número: 1001 | Agência: 1 | Saldo: R$ -420.00 | Titular: João Silva | Limite Especial: R$ 500.00 | Taxa Manutenção: R$ 20.00
-Conta Poupança | Número: 2001 | Agência: 1 | Saldo: R$ 1909.50 | Titular: Maria Souza | Taxa Rendimento: 0.005
-```
+O projeto tem como objetivo simular operações e estruturas fundamentais de um ambiente bancário.
 
-## Como executar
+Entre os elementos trabalhados estão:
 
-Pré-requisito: JDK instalado (11+).
+- Gerenciamento de clientes.
+- Representação de contas bancárias.
+- Contas correntes.
+- Contas poupança.
+- Operações e transações financeiras.
+- Regras de movimentação bancária.
+- Validações de operações.
+- Tratamento de situações excepcionais.
+
+## Banco de dados
+
+A aplicação utiliza o H2 Database integrado ao Spring Data JPA e Hibernate para trabalhar com persistência de dados durante o desenvolvimento.
+
+A camada de persistência é responsável por intermediar o acesso aos dados e manter a separação entre as regras de negócio e a infraestrutura do banco.
+
+As configurações internas de ambiente são mantidas fora da documentação pública.
+
+## Como executar o projeto
+
+### Pré-requisitos
+
+- Java Development Kit (JDK) compatível com a versão definida no projeto.
+- Apache Maven.
+- Git.
+- IDE de sua preferência (IntelliJ IDEA, Eclipse ou Visual Studio Code).
+
+### 1. Clonar o repositório
 
 ```bash
-# Compilar
-javac -d bin src/application/*.java src/model/entities/*.java src/model/exceptions/*.java src/model/util/*.java
-
-# Executar a simulação principal
-java -cp bin application.Main
-
-# Executar os cenários de exceção/validação
-java -cp bin application.Testes
+git clone URL_DO_REPOSITORIO
 ```
 
-Ou, se preferir, basta abrir o projeto em uma IDE (VS Code, IntelliJ, Eclipse) e rodar a classe `Main.java` (ou `Testes.java`) diretamente.
+### 2. Acessar a pasta do projeto
 
-## Diagrama UML (classes)
-
-```mermaid
-classDiagram
-    class Cliente {
-        -Long id
-        -String nome
-        -String documento
-        -TipoCliente tipoCliente
-        +toString() String
-    }
-
-    class Conta {
-        <<abstract>>
-        -Long id
-        -Integer numero
-        -Integer agencia
-        #BigDecimal saldo
-        +depositar(BigDecimal) void
-        +sacar(BigDecimal) void
-        +sacar(BigDecimal, TipoTransacao, String) void
-        +transferir(BigDecimal, Conta) void
-        #adicionarTransacao(BigDecimal, TipoTransacao, String) void
-        +imprimirExtrato() void
-        +toString() String
-    }
-
-    class ContaCorrente {
-        -BigDecimal limiteEspecial
-        -BigDecimal taxaManutencao
-        +sacar(BigDecimal, TipoTransacao, String) void
-        +cobrarTaxaManutencao() void
-        +toString() String
-    }
-
-    class ContaPoupanca {
-        -BigDecimal taxaRendimento
-        +renderJuros() void
-        +toString() String
-    }
-
-    class Transacao {
-        -Long id
-        -ZonedDateTime dataHora
-        -BigDecimal valor
-        -TipoTransacao tipo
-        -String descricao
-        -DateTimeFormatter FORMATADOR$
-        +toString() String
-    }
-
-    class Banco {
-        -String nome
-        +adicionarConta(Conta) void
-        +buscarConta(Integer) Conta
-        +listarContas() void
-    }
-
-    class TipoCliente {
-        <<enumeration>>
-        PESSOA_FISICA
-        PESSOA_JURIDICA
-    }
-
-    class TipoTransacao {
-        <<enumeration>>
-        DEPOSITO
-        SAQUE
-        TRANSFERENCIA
-        TAXA_MANUTENCAO
-        RENDIMENTO
-    }
-
-    class DomainException {
-        <<exception>>
-    }
-
-    class ValorInvalidoException {
-        <<exception>>
-    }
-
-    class SaldoInsuficienteException {
-        <<exception>>
-    }
-
-    class MonetarioConfig {
-        <<utility>>
-        +SCALE: int$
-        +SCALE_TAXA: int$
-        +ROUNDING_MODE: RoundingMode$
-    }
-
-    Conta <|-- ContaCorrente
-    Conta <|-- ContaPoupanca
-    Conta "1" o-- "1" Cliente : titular
-    Conta "1" *-- "*" Transacao : historico
-    Banco "1" o-- "*" Conta : contas
-    Cliente --> TipoCliente
-    Transacao --> TipoTransacao
-    ValorInvalidoException --|> DomainException
-    SaldoInsuficienteException --|> DomainException
-    Conta ..> DomainException : lança
-    Conta ..> MonetarioConfig : usa
-
+```bash
+cd bank-simulator
 ```
 
-## Roadmap (próximas etapas)
+### 3. Compilar a aplicação
 
-- [x] Modelagem do domínio em Java puro (em refinamento)
-- [ ] Migração para projeto **Maven** (gerenciamento de dependências e build)
-- [ ] Introdução ao **Spring / Spring Boot** (camadas de Controller e Service)
-- [ ] Persistência com **JPA / Hibernate**
-- [ ] Banco de dados **H2** (em memória, para testes/desenvolvimento)
-- [ ] Testes automatizados (JUnit)
-- [ ] Exposição de uma API REST para as operações bancárias
+```bash
+mvn clean install
+```
+
+### 4. Executar os testes
+
+```bash
+mvn test
+```
+
+### 5. Inicializar a aplicação
+
+```bash
+mvn spring-boot:run
+```
+
+A aplicação será iniciada conforme as configurações definidas no ambiente de execução.
+
+## Testes
+
+O projeto possui uma estrutura dedicada aos testes automatizados, permitindo verificar o comportamento dos componentes e a aplicação das regras de negócio.
+
+Para executar a suíte de testes:
+
+```bash
+mvn test
+```
+
+## Boas práticas adotadas
+
+- Separação de responsabilidades.
+- Organização modular do código.
+- Utilização de padrões de arquitetura.
+- Centralização do tratamento de exceções.
+- Reutilização de componentes.
+- Organização das dependências.
+- Controle de versão com Git.
+- Separação entre código-fonte e configurações de ambiente.
+
+## Controle de versão
+
+O histórico de desenvolvimento é organizado utilizando Git e GitHub.
+
+A evolução do projeto mantém a versão inicial em Java puro preservada por meio de versionamento, enquanto a nova arquitetura representa uma etapa independente de evolução.
+
+## Próximas evoluções
+
+- Ampliação da cobertura de testes automatizados.
+- Aprimoramento das validações de negócio.
+- Evolução dos recursos da API REST.
+- Melhorias na documentação técnica.
+- Implementação de novos recursos bancários.
+- Aprimoramento da persistência de dados.
+- Evolução da segurança da aplicação.
 
 ## Licença
 
-Distribuído sob os termos definidos no arquivo [LICENSE](./LICENSE).
+Este projeto está distribuído sob os termos definidos no arquivo [LICENSE](./LICENSE).
+
+## Aviso
+
+Este projeto possui finalidade educacional e de estudo, voltado ao desenvolvimento de conhecimentos em Java, Spring Boot, arquitetura backend e engenharia de software.
+
+Não se trata de um sistema bancário real e não deve ser utilizado para processar operações financeiras reais.
+
+---
+
+**Bank Simulator**  
+*Evoluindo conhecimentos em Java e desenvolvimento backend.*

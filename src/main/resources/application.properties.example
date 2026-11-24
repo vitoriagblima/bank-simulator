@@ -1,0 +1,16 @@
+
+# Identificação da aplicação
+spring.application.name=simulador-bancario
+
+# Configuração do banco de dados
+# Defina os parâmetros conforme seu ambiente.
+
+# Configuração JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.open-in-view=false
+
+# Console H2 (somente desenvolvimento)
+spring.h2.console.enabled=false
+
+# Documentação da API
+springdoc.swagger-ui.enabled=true
