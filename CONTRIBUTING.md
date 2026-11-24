@@ -22,6 +22,6 @@ Obrigado pelo interesse em contribuir com este projeto! Como este é um reposit�
 
 ## Padrões do Projeto
 
-- **Linguagem:** Java 11 ou superior.
+- **Linguagem:** Java 17 ou superior.
 - **Estrutura:** Mantenha a separação de pacotes (`application` para entrada no console/Main e `entities` para o modelo de domínio).
 - **Boas Práticas:** Respeite o encapsulamento, o uso correto dos modificadores de acesso e a legibilidade do código.
