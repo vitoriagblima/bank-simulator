@@ -10,7 +10,7 @@
 
 O **Bank Simulator** é uma aplicação de simulação bancária desenvolvida em Java, com foco na aplicação de conceitos de Programação Orientada a Objetos, arquitetura de software e desenvolvimento backend.
 
-O projeto iniciou como uma aplicação Java puro e evoluiu para uma arquitetura baseada em **Spring Boot e Maven**, incorporando desenvolvimento de APIs REST, organização em camadas, persistência com JPA/Hibernate, tratamento padronizado de erros (`ProblemDetail` / RFC 9457) e testes automatizados.
+O projeto iniciou como uma aplicação Java puro e evoluiu para uma arquitetura baseada em **Spring Boot e Maven**, incorporando desenvolvimento de APIs REST, organização em camadas, persistência com JPA/Hibernate, tratamento padronizado de erros e testes automatizados.
 
 ## Evolução do projeto
 
@@ -158,8 +158,3 @@ Este projeto está distribuído sob os termos definidos no arquivo [LICENSE](./L
 Este projeto possui finalidade educacional e de estudo, voltado ao desenvolvimento de conhecimentos em Java, Spring Boot, arquitetura backend e engenharia de software.
 
 Não se trata de um sistema bancário real e não deve ser utilizado para processar operações financeiras reais.
-
----
-
-**Bank Simulator**  
-*Evoluindo conhecimentos em Java e desenvolvimento backend.*
