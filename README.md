@@ -1,10 +1,10 @@
 # Bank Simulator
 
-![Java](https://img.shields.io/badge/Java-Backend-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Framework-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
-![Maven](https://img.shields.io/badge/Maven-Build%20Tool-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
-![JPA](https://img.shields.io/badge/Spring%20Data%20JPA-Persistence-6DB33F?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-orange?style=for-the-badge)
+![Java](https://img.shields.io/badge/Java-Backend-000000?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Framework-000000?style=for-the-badge&logo=springboot&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-Build%20Tool-000000?style=for-the-badge&logo=apachemaven&logoColor=white)
+![JPA](https://img.shields.io/badge/Spring%20Data%20JPA-Persistence-000000?style=for-the-badge&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-000000?style=for-the-badge)
 
 ## Sobre o projeto
 
@@ -117,7 +117,7 @@ As configurações internas de ambiente são mantidas fora da documentação pú
 ### 1. Clonar o repositório
 
 ```bash
-git clone URL_DO_REPOSITORIO
+git clone https://github.com/vitoriagblima/bank-simulator
 ```
 
 ### 2. Acessar a pasta do projeto
