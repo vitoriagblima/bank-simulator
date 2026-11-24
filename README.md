@@ -10,9 +10,7 @@
 
 O **Bank Simulator** é uma aplicação de simulação bancária desenvolvida em Java, com foco na aplicação de conceitos de Programação Orientada a Objetos, arquitetura de software e desenvolvimento backend.
 
-O projeto iniciou como uma aplicação Java puro e evoluiu para uma arquitetura baseada em **Spring Boot e Maven**, incorporando conceitos de desenvolvimento de APIs REST, organização em camadas e persistência de dados.
-
-Essa evolução representa uma nova etapa do projeto, buscando maior organização, escalabilidade, manutenção e aplicação de boas práticas de desenvolvimento.
+O projeto iniciou como uma aplicação Java puro e evoluiu para uma arquitetura baseada em **Spring Boot e Maven**, incorporando desenvolvimento de APIs REST, organização em camadas, persistência com JPA/Hibernate, tratamento padronizado de erros (`ProblemDetail` / RFC 9457) e testes automatizados.
 
 ## Evolução do projeto
 
@@ -21,167 +19,135 @@ O desenvolvimento foi dividido em duas etapas principais:
 **Versão 1 — Java puro**
 - Estrutura baseada em Programação Orientada a Objetos.
 - Modelagem de entidades bancárias.
-- Implementação de regras de negócio.
-- Organização das responsabilidades da aplicação.
+- Implementação de regras de negócio no console.
 
 **Versão 2 — Spring Boot e Maven**
-- Migração para uma arquitetura backend.
-- Organização em camadas.
-- Desenvolvimento com Spring Boot.
+- Migração para arquitetura backend em camadas.
+- Exposição de endpoints REST e validação com Bean Validation (`@Valid`).
 - Gerenciamento de dependências com Maven.
-- Integração com Spring Data JPA e Hibernate.
-- Utilização de banco de dados H2.
-- Estruturação de endpoints REST.
-- Organização de DTOs e tratamento de exceções.
+- Persistência com Spring Data JPA, Hibernate e banco H2.
+- Controle de concorrência otimista (`@Version`) em contas.
+- Tratamento centralizado de exceções com `ProblemDetail`.
+- Testes unitários de domínio e testes de integração com `MockMvc`.
 
 ## Tecnologias utilizadas
 
 | Tecnologia | Finalidade |
 |---|---|
-| Java | Linguagem de programação |
+| Java 17+ | Linguagem de programação |
 | Spring Boot | Framework para desenvolvimento backend |
 | Apache Maven | Gerenciamento de dependências e build |
 | Spring Data JPA | Persistência e acesso a dados |
 | Hibernate | Mapeamento objeto-relacional (ORM) |
-| H2 Database | Banco de dados para desenvolvimento |
-| REST API | Comunicação e exposição de recursos |
-| Swagger / Springdoc | Documentação da API |
-| JUnit | Testes automatizados |
+| H2 Database | Banco de dados para desenvolvimento e testes |
+| Bean Validation | Validação de dados de entrada nos DTOs |
+| Swagger / Springdoc | Documentação interativa da API |
+| JUnit 5 & MockMvc | Testes unitários e de integração |
 
 ## Arquitetura do projeto
 
-A aplicação utiliza uma arquitetura organizada em camadas, buscando separar responsabilidades e facilitar a manutenção e evolução do código.
-
-### Organização dos pacotes
+A aplicação utiliza uma arquitetura organizada em camadas dentro de `com.bancojava.simulador`:
 
 | Pacote | Responsabilidade |
 |---|---|
-| `config` | Configurações da aplicação |
-| `controller` | Recebimento e gerenciamento das requisições HTTP |
-| `dto` | Transferência de dados entre as camadas |
-| `exception` | Exceções e tratamento de erros |
-| `model` | Entidades e representação do domínio bancário |
-| `repository` | Acesso e persistência de dados |
-| `service` | Implementação das regras de negócio |
-| `util` | Classes auxiliares e utilitários |
-
-## Conceitos aplicados
-
-Durante o desenvolvimento, são trabalhados conceitos importantes da engenharia de software:
-
-- Programação Orientada a Objetos (POO).
-- Encapsulamento e abstração.
-- Separação de responsabilidades.
-- Arquitetura em camadas.
-- Desenvolvimento de APIs REST.
-- Transferência de dados com DTOs.
-- Persistência e mapeamento objeto-relacional.
-- Injeção de dependências.
-- Tratamento centralizado de exceções.
-- Validação de regras de negócio.
-- Testes automatizados.
-- Controle de versão com Git.
+| `config` | Configurações e carga inicial de demonstração (`DataInitializer`) |
+| `controller` | Recebimento de requisições HTTP e tratamento global de erros (`GlobalExceptionHandler`) |
+| `dto` | Objetos de transferência e validação de entrada/saída (`records`) |
+| `exception` | Exceções específicas de domínio |
+| `model` | Entidades JPA e regras de negócio bancárias |
+| `repository` | Interfaces de acesso e persistência de dados |
+| `service` | Regras de aplicação e controle transacional |
+| `util` | Configurações e formatação monetária (`MonetarioConfig`) |
 
 ## Funcionalidades e domínio bancário
 
-O projeto tem como objetivo simular operações e estruturas fundamentais de um ambiente bancário.
+- **Clientes:** cadastro e consulta de clientes (`PESSOA_FISICA` e `PESSOA_JURIDICA`) com unicidade de documento.
+- **Contas Correntes:** abertura com limite especial e cobrança de taxa de manutenção.
+- **Contas Poupança:** abertura com taxa de rendimento e aplicação de juros sobre saldo positivo.
+- **Operações financeiras:** depósitos, saques, transferências entre contas e consulta de extrato.
+- **Precisão monetária:** uso de `BigDecimal` com arredondamento bancário (`RoundingMode.HALF_EVEN`).
 
-Entre os elementos trabalhados estão:
+## Endpoints da API
 
-- Gerenciamento de clientes.
-- Representação de contas bancárias.
-- Contas correntes.
-- Contas poupança.
-- Operações e transações financeiras.
-- Regras de movimentação bancária.
-- Validações de operações.
-- Tratamento de situações excepcionais.
+### Clientes (`/api/clientes`)
+| Método | Rota | Descrição |
+|---|---|---|
+| `POST` | `/api/clientes` | Cadastra um novo cliente |
+| `GET` | `/api/clientes/{id}` | Busca um cliente pelo ID |
 
-## Banco de dados
-
-A aplicação utiliza o H2 Database integrado ao Spring Data JPA e Hibernate para trabalhar com persistência de dados durante o desenvolvimento.
-
-A camada de persistência é responsável por intermediar o acesso aos dados e manter a separação entre as regras de negócio e a infraestrutura do banco.
-
-As configurações internas de ambiente são mantidas fora da documentação pública.
+### Contas (`/api/contas`)
+| Método | Rota | Descrição |
+|---|---|---|
+| `POST` | `/api/contas/corrente` | Abre uma conta corrente |
+| `POST` | `/api/contas/poupanca` | Abre uma conta poupança |
+| `GET` | `/api/contas` | Lista todas as contas |
+| `GET` | `/api/contas/{numero}` | Busca uma conta pelo número |
+| `GET` | `/api/contas/{numero}/extrato` | Lista as movimentações da conta |
+| `POST` | `/api/contas/{numero}/depositos` | Realiza um depósito |
+| `POST` | `/api/contas/{numero}/saques` | Realiza um saque |
+| `POST` | `/api/contas/{numero}/transferencias` | Transfere valores para outra conta |
+| `POST` | `/api/contas/{numero}/rendimentos` | Aplica rendimento (conta poupança) |
+| `POST` | `/api/contas/{numero}/taxa-manutencao` | Cobra taxa de manutenção (conta corrente) |
 
 ## Como executar o projeto
 
 ### Pré-requisitos
 
-- Java Development Kit (JDK) compatível com a versão definida no projeto.
+- Java Development Kit (JDK) 17 ou superior.
 - Apache Maven.
 - Git.
-- IDE de sua preferência (IntelliJ IDEA, Eclipse ou Visual Studio Code).
 
 ### 1. Clonar o repositório
 
 ```bash
 git clone https://github.com/vitoriagblima/bank-simulator
-```
-
-### 2. Acessar a pasta do projeto
-
-```bash
 cd bank-simulator
 ```
 
-### 3. Compilar a aplicação
+### 2. Configurar o ambiente
+
+Copie o arquivo de exemplo de configuração e ajuste os parâmetros do banco de dados conforme o seu ambiente:
 
 ```bash
-mvn clean install
+cp src/main/resources/application.properties.example src/main/resources/application.properties
 ```
 
-### 4. Executar os testes
+### 3. Compilar e executar os testes
 
 ```bash
-mvn test
+mvn clean test
 ```
 
-### 5. Inicializar a aplicação
+### 4. Inicializar a aplicação
 
 ```bash
 mvn spring-boot:run
 ```
 
-A aplicação será iniciada conforme as configurações definidas no ambiente de execução.
+Ao iniciar fora do perfil `test`, a classe `DataInitializer` cria automaticamente dados de demonstração (conta corrente `1001` para João Silva e conta poupança `2001` para Maria Souza).
+
+Com a aplicação em execução e o Swagger habilitado, a documentação interativa estará disponível em:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
 
 ## Testes
 
-O projeto possui uma estrutura dedicada aos testes automatizados, permitindo verificar o comportamento dos componentes e a aplicação das regras de negócio.
+O projeto possui testes automatizados divididos em:
 
-Para executar a suíte de testes:
+- **Testes de domínio (`ContaTest`):** validam regras de negócio, arredondamento e exceções sem dependência do Spring ou banco de dados.
+- **Testes de integração (`ContaControllerTest`):** validam os endpoints REST, status HTTP e persistência em memória com H2 no perfil `test`.
+
+Para executar toda a suíte:
 
 ```bash
 mvn test
 ```
 
-## Boas práticas adotadas
+## Contribuição
 
-- Separação de responsabilidades.
-- Organização modular do código.
-- Utilização de padrões de arquitetura.
-- Centralização do tratamento de exceções.
-- Reutilização de componentes.
-- Organização das dependências.
-- Controle de versão com Git.
-- Separação entre código-fonte e configurações de ambiente.
-
-## Controle de versão
-
-O histórico de desenvolvimento é organizado utilizando Git e GitHub.
-
-A evolução do projeto mantém a versão inicial em Java puro preservada por meio de versionamento, enquanto a nova arquitetura representa uma etapa independente de evolução.
-
-## Próximas evoluções
-
-- Ampliação da cobertura de testes automatizados.
-- Aprimoramento das validações de negócio.
-- Evolução dos recursos da API REST.
-- Melhorias na documentação técnica.
-- Implementação de novos recursos bancários.
-- Aprimoramento da persistência de dados.
-- Evolução da segurança da aplicação.
+Contribuições são bem-vindas! Confira o [Guia de Contribuição](./CONTRIBUTING.md) e o [Código de Conduta](./CODE_OF_CONDUCT.md) antes de enviar um Pull Request.
 
 ## Licença
 
