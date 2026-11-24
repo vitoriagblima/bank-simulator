@@ -1,15 +1,36 @@
-package model.entities;
+package com.bancojava.simulador.model;
 
-import model.exceptions.ValorInvalidoException;
+import com.bancojava.simulador.exception.ValorInvalidoException;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "clientes")
 public class Cliente {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 120)
     private String nome;
+
+    @Column(nullable = false, unique = true, length = 20)
     private String documento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_cliente", nullable = false, length = 20)
     private TipoCliente tipoCliente;
 
-    public Cliente() {
+    /** Construtor exigido pelo JPA. */
+    protected Cliente() {
     }
 
     public Cliente(String nome, String documento, TipoCliente tipoCliente) {
@@ -19,11 +40,11 @@ public class Cliente {
     }
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public String getNome() {
-        return this.nome;
+        return nome;
     }
 
     public void setNome(String nome) {
@@ -34,7 +55,7 @@ public class Cliente {
     }
 
     public String getDocumento() {
-        return this.documento;
+        return documento;
     }
 
     public void setDocumento(String documento) {
@@ -45,7 +66,7 @@ public class Cliente {
     }
 
     public TipoCliente getTipoCliente() {
-        return this.tipoCliente;
+        return tipoCliente;
     }
 
     public void setTipoCliente(TipoCliente tipoCliente) {

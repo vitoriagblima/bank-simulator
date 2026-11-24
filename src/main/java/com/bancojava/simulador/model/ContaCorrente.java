@@ -1,16 +1,26 @@
-package model.entities;
+package com.bancojava.simulador.model;
 
 import java.math.BigDecimal;
 
-import model.exceptions.ValorInvalidoException;
-import model.util.MonetarioConfig;
+import com.bancojava.simulador.exception.ValorInvalidoException;
+import com.bancojava.simulador.util.MonetarioConfig;
 
-public final class ContaCorrente extends Conta {
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
+@Entity
+@DiscriminatorValue("CORRENTE")
+public class ContaCorrente extends Conta {
+
+    @Column(name = "limite_especial", precision = 19, scale = 2)
     private BigDecimal limiteEspecial;
+
+    @Column(name = "taxa_manutencao", precision = 19, scale = 2)
     private BigDecimal taxaManutencao;
 
-    public ContaCorrente() {
+    /** Construtor exigido pelo JPA. */
+    protected ContaCorrente() {
         super();
         this.limiteEspecial = normalizar(BigDecimal.ZERO);
         this.taxaManutencao = normalizar(BigDecimal.ZERO);
@@ -47,7 +57,7 @@ public final class ContaCorrente extends Conta {
     }
 
     public BigDecimal getLimiteEspecial() {
-        return this.limiteEspecial;
+        return limiteEspecial;
     }
 
     public void setLimiteEspecial(BigDecimal limiteEspecial) {
@@ -61,7 +71,7 @@ public final class ContaCorrente extends Conta {
     }
 
     public BigDecimal getTaxaManutencao() {
-        return this.taxaManutencao;
+        return taxaManutencao;
     }
 
     public void setTaxaManutencao(BigDecimal taxaManutencao) {

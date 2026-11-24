@@ -1,16 +1,24 @@
-package model.entities;
+package com.bancojava.simulador.model;
 
 import java.math.BigDecimal;
 
-import model.exceptions.DomainException;
-import model.exceptions.ValorInvalidoException;
-import model.util.MonetarioConfig;
+import com.bancojava.simulador.exception.DomainException;
+import com.bancojava.simulador.exception.ValorInvalidoException;
+import com.bancojava.simulador.util.MonetarioConfig;
 
-public final class ContaPoupanca extends Conta {
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
+@Entity
+@DiscriminatorValue("POUPANCA")
+public class ContaPoupanca extends Conta {
+
+    @Column(name = "taxa_rendimento", precision = 10, scale = 4)
     private BigDecimal taxaRendimento;
 
-    public ContaPoupanca() {
+    /** Construtor exigido pelo JPA. */
+    protected ContaPoupanca() {
         super();
         this.taxaRendimento = normalizarTaxa(BigDecimal.ZERO);
     }
@@ -33,7 +41,6 @@ public final class ContaPoupanca extends Conta {
             throw new DomainException("Não é possível aplicar rendimentos em uma conta sem saldo positivo.");
         }
         // Arredondamento único: saldo x taxa é arredondado direto para centavos.
-        // (Antes, arredondava para 4 casas e depois para 2, o que gerava erro de arredondamento.)
         BigDecimal rendimento = getSaldo()
                 .multiply(taxaRendimento)
                 .setScale(MonetarioConfig.SCALE, MonetarioConfig.ROUNDING_MODE);
@@ -49,7 +56,7 @@ public final class ContaPoupanca extends Conta {
     }
 
     public BigDecimal getTaxaRendimento() {
-        return this.taxaRendimento;
+        return taxaRendimento;
     }
 
     public void setTaxaRendimento(BigDecimal taxaRendimento) {

@@ -1,4 +1,4 @@
-package model.entities;
+package com.bancojava.simulador.model;
 
 public enum TipoTransacao {
 
@@ -7,5 +7,5 @@ public enum TipoTransacao {
     TRANSFERENCIA,
     TRANSFERENCIA_RECEBIDA,
     TAXA_MANUTENCAO,
-    RENDIMENTO;
+    RENDIMENTO
 }

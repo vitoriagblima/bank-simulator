@@ -1,4 +1,4 @@
-package model.util;
+package com.bancojava.simulador.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
