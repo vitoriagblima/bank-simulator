@@ -1,0 +1,95 @@
+name: Testes da API (Postman/Newman)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    name: Testes manuais automatizados da API
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Compilar a aplicação
+        run: mvn -B -DskipTests package
+
+      - name: Subir a aplicação e aguardar o seed
+        run: |
+          nohup java -jar target/simulador-bancario-2.0.0.jar > app.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8080/api/clientes/2 > /dev/null; then
+              echo "Aplicação no ar com dados iniciais"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "A aplicação não subiu a tempo"
+          cat app.log
+          exit 1
+
+      - name: Rodar a coleção no Newman
+        run: |
+          npx -y newman run testes/postman/bank-simulator.postman_collection.json \
+            -e testes/postman/bank-simulator-local.postman_environment.json \
+            -r cli,json \
+            --reporter-json-export newman-report.json
+
+      - name: Publicar o resumo na execução
+        if: always()
+        run: |
+          node -e '
+          const fs = require("fs");
+          if (!fs.existsSync("newman-report.json")) {
+            console.log("Relatório não gerado");
+            process.exit(0);
+          }
+          const run = JSON.parse(fs.readFileSync("newman-report.json", "utf8")).run;
+          const s = run.stats;
+          const falhas = run.failures || [];
+          let md = "## Testes da API (Postman/Newman)\n\n";
+          md += "| Métrica | Total | Falhas |\n|---|---|---|\n";
+          md += `| Requisições | ${s.requests.total} | ${s.requests.failed} |\n`;
+          md += `| Verificações | ${s.assertions.total} | ${s.assertions.failed} |\n\n`;
+          if (falhas.length) {
+            md += "### Casos reprovados\n\n| Caso | Verificação | Erro |\n|---|---|---|\n";
+            for (const f of falhas) {
+              const msg = String(f.error.message).split("\n")[0].replace(/\|/g, "\\|");
+              md += `| ${f.source.name} | ${f.error.test} | ${msg} |\n`;
+            }
+          } else {
+            md += "Todos os casos passaram.\n";
+          }
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
+          '
+
+      - name: Guardar os relatórios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-newman
+          path: |
+            newman-report.json
+            app.log
+          if-no-files-found: ignore
+
+      - name: Encerrar a aplicação
+        if: always()
+        run: pkill -f simulador-bancario || true
