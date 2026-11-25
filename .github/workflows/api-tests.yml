@@ -47,11 +47,10 @@ jobs:
 
       - name: Rodar a coleção no Newman
         run: |
-          npx -y -p newman -p newman-reporter-html newman run testes/postman/bank-simulator.postman_collection.json \
+          npx -y newman run testes/postman/bank-simulator.postman_collection.json \
             -e testes/postman/bank-simulator-local.postman_environment.json \
-            -r cli,json,html \
-            --reporter-json-export newman-report.json \
-            --reporter-html-export newman-report.html
+            -r cli,json \
+            --reporter-json-export newman-report.json
 
       - name: Publicar o resumo na execução
         if: always()
@@ -88,7 +87,6 @@ jobs:
           name: relatorio-newman
           path: |
             newman-report.json
-            newman-report.html
             app.log
           if-no-files-found: ignore
 
