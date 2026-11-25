@@ -1993,7 +1993,7 @@
             "method": "POST",
             "header": [],
             "url": "{{baseUrl}}/api/contas/4002/rendimentos",
-            "description": "Esperado: HTTP 422 — erro de regra de negócio, NÃO 500 (ver observação)\n\nObservação: Código lança DomainException sem handler: tende a responder 500."
+            "description": "Esperado: HTTP 422 — regra de negócio. A poupança sem saldo positivo deve retornar ProblemDetail, nunca HTTP 500."
           },
           "event": [
             {
