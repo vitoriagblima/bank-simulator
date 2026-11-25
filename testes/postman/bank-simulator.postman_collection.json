@@ -1,0 +1,2689 @@
+{
+  "info": {
+    "_postman_id": "5a0b3925-5dea-4089-b1f0-3b781f9035f1",
+    "name": "Bank Simulator — Testes Manuais",
+    "description": "Cenários de teste manual da API do Bank Simulator. Reinicie a aplicação antes de cada rodada: a coleção assume o banco H2 zerado com os dados do DataInitializer. Execute na ordem (Collection Runner).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 - Pré-condição (dados iniciais)",
+      "item": [
+        {
+          "name": "SEED-01 — Cliente João (seed) existe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/clientes/1",
+            "description": "Esperado: HTTP 200 — nome \"João Silva\""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"nome = João Silva\", () => pm.expect(body.nome).to.eql(\"João Silva\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SEED-02 — Cliente Maria (seed) existe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/clientes/2",
+            "description": "Esperado: HTTP 200 — nome \"Maria Souza\""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"nome = Maria Souza\", () => pm.expect(body.nome).to.eql(\"Maria Souza\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SEED-03 — Conta corrente 1001 do seed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/1001",
+            "description": "Esperado: HTTP 200 — corrente, saldo -420.00, limite 500, taxa 20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipo = Conta Corrente\", () => pm.expect(body.tipo).to.eql(\"Conta Corrente\"));",
+                  "pm.test(\"saldo = -420\", () => pm.expect(Number(body.saldo)).to.eql(-420));",
+                  "pm.test(\"limite = 500\", () => pm.expect(Number(body.limiteEspecial)).to.eql(500));",
+                  "pm.test(\"taxa = 20\", () => pm.expect(Number(body.taxaManutencao)).to.eql(20));",
+                  "pm.test(\"titular = João Silva\", () => pm.expect(body.titular).to.eql(\"João Silva\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SEED-04 — Conta poupança 2001 do seed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/2001",
+            "description": "Esperado: HTTP 200 — poupança, saldo 1909.50, taxa 0.0050"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipo = Conta Poupança\", () => pm.expect(body.tipo).to.eql(\"Conta Poupança\"));",
+                  "pm.test(\"saldo = 1909.5\", () => pm.expect(Number(body.saldo)).to.eql(1909.5));",
+                  "pm.test(\"taxa = 0.005\", () => pm.expect(Number(body.taxaRendimento)).to.eql(0.005));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SEED-05 — Extrato da 1001 (seed)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/1001/extrato",
+            "description": "Esperado: HTTP 200 — DEPOSITO 1000, SAQUE 1300, TRANSFERENCIA 100, TAXA_MANUTENCAO 20"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipos\", () => pm.expect(body.map(m => m.tipo)).to.eql([\"DEPOSITO\",\"SAQUE\",\"TRANSFERENCIA\",\"TAXA_MANUTENCAO\"]));",
+                  "pm.test(\"valores\", () => pm.expect(body.map(m => Number(m.valor))).to.eql([1000,1300,100,20]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SEED-06 — Extrato da 2001 (seed)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/2001/extrato",
+            "description": "Esperado: HTTP 200 — DEPOSITO 2000, SAQUE 200, TRANSFERENCIA_RECEBIDA 100, RENDIMENTO 9.50"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipos\", () => pm.expect(body.map(m => m.tipo)).to.eql([\"DEPOSITO\",\"SAQUE\",\"TRANSFERENCIA_RECEBIDA\",\"RENDIMENTO\"]));",
+                  "pm.test(\"valores\", () => pm.expect(body.map(m => Number(m.valor))).to.eql([2000,200,100,9.5]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Clientes",
+      "item": [
+        {
+          "name": "CLI-01 — Cadastrar pessoa física",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "description": "Esperado: HTTP 201 — cria cliente e retorna id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Carlos Lima\",\n  \"documento\": \"111.111.111-11\",\n  \"tipo\": \"PESSOA_FISICA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"id é número\", () => pm.expect(typeof body.id).to.eql(\"number\"));",
+                  "pm.test(\"nome\", () => pm.expect(body.nome).to.eql(\"Carlos Lima\"));",
+                  "pm.collectionVariables.set(\"cliCarlosId\", String(body.id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-02 — Cadastrar pessoa jurídica",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "description": "Esperado: HTTP 201 — cria cliente PJ",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Loja Exemplo LTDA\",\n  \"documento\": \"00.000.000/0001-00\",\n  \"tipo\": \"PESSOA_JURIDICA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"tipo\", () => pm.expect(body.tipo).to.eql(\"PESSOA_JURIDICA\"));",
+                  "pm.collectionVariables.set(\"cliPjId\", String(body.id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-03 — Documento duplicado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "description": "Esperado: HTTP 409 — rejeita documento já cadastrado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Outro Nome\",\n  \"documento\": \"111.111.111-11\",\n  \"tipo\": \"PESSOA_FISICA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(409));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Já existe um cliente cadastrado com o documento 111.111.111-11.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-04 — Documento duplicado com espaços nas bordas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "description": "Esperado: HTTP 409 — o documento é normalizado (trim) e continua duplicado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Outro Nome\",\n  \"documento\": \"  111.111.111-11  \",\n  \"tipo\": \"PESSOA_FISICA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(409));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Já existe um cliente cadastrado com o documento 111.111.111-11.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-05 — Nome vazio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "description": "Esperado: HTTP 400 — validação @NotBlank",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"documento\": \"222.222.222-22\",\n  \"tipo\": \"PESSOA_FISICA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-06 — Nome com 121 caracteres",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "description": "Esperado: HTTP 400 — validação @Size(max=120)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\n  \"documento\": \"222.222.222-22\",\n  \"tipo\": \"PESSOA_FISICA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-07 — Sem documento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "description": "Esperado: HTTP 400 — validação @NotBlank no documento",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sem Documento\",\n  \"tipo\": \"PESSOA_FISICA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-08 — Tipo de cliente inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/clientes",
+            "description": "Esperado: HTTP 400 — enum inexistente",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Tipo Errado\",\n  \"documento\": \"333.333.333-33\",\n  \"tipo\": \"EMPRESA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-09 — Buscar cliente cadastrado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/clientes/{{cliCarlosId}}",
+            "description": "Esperado: HTTP 200 — retorna o Carlos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"nome\", () => pm.expect(body.nome).to.eql(\"Carlos Lima\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CLI-10 — Buscar cliente inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/clientes/999999",
+            "description": "Esperado: HTTP 404 — não encontrado"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Cliente com o id 999999 não foi encontrado.\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Abertura de contas",
+      "item": [
+        {
+          "name": "CTA-01 — Abrir corrente 3001 (Carlos, limite 300, taxa 15)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 201 — saldo 0, limite 300, taxa 15",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3001,\"agencia\":1,\"clienteId\":{{cliCarlosId}},\"limiteEspecial\":300.00,\"taxaManutencao\":15.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"tipo\", () => pm.expect(body.tipo).to.eql(\"Conta Corrente\"));",
+                  "pm.test(\"saldo 0\", () => pm.expect(Number(body.saldo)).to.eql(0));",
+                  "pm.test(\"limite 300\", () => pm.expect(Number(body.limiteEspecial)).to.eql(300));",
+                  "pm.test(\"titular\", () => pm.expect(body.titular).to.eql(\"Carlos Lima\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-02 — Abrir poupança 4001 (Loja, taxa 0.01)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/poupanca",
+            "description": "Esperado: HTTP 201 — saldo 0, taxa 0.01, sem limite",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":4001,\"agencia\":1,\"clienteId\":{{cliPjId}},\"taxaRendimento\":0.0100}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"tipo\", () => pm.expect(body.tipo).to.eql(\"Conta Poupança\"));",
+                  "pm.test(\"taxa 0.01\", () => pm.expect(Number(body.taxaRendimento)).to.eql(0.01));",
+                  "pm.test(\"limite nulo\", () => pm.expect(body.limiteEspecial).to.eql(null));",
+                  "pm.test(\"titular\", () => pm.expect(body.titular).to.eql(\"Loja Exemplo LTDA\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-03 — Abrir corrente 3003 (limite 0, taxa 10)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 201 — taxa 10",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3003,\"agencia\":1,\"clienteId\":{{cliCarlosId}},\"limiteEspecial\":0,\"taxaManutencao\":10.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-04 — Abrir poupança 4002 (sem saldo, para teste de rendimento)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/poupanca",
+            "description": "Esperado: HTTP 201 — criada",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":4002,\"agencia\":1,\"clienteId\":{{cliPjId}},\"taxaRendimento\":0.0100}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-05 — Abrir corrente 3004 com taxa zero (aceito na abertura)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 201 — taxa 0",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3004,\"agencia\":2,\"clienteId\":{{cliPjId}},\"limiteEspecial\":0,\"taxaManutencao\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"taxa 0\", () => pm.expect(Number(body.taxaManutencao)).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-06 — Abrir corrente 3005 (limite 200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 201 — limite 200",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3005,\"agencia\":1,\"clienteId\":{{cliCarlosId}},\"limiteEspecial\":200.00,\"taxaManutencao\":5.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-07 — Abrir poupança 4003 (Carlos)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/poupanca",
+            "description": "Esperado: HTTP 201 — criada",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":4003,\"agencia\":1,\"clienteId\":{{cliCarlosId}},\"taxaRendimento\":0.0100}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-08 — Número de conta duplicado (3001)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/poupanca",
+            "description": "Esperado: HTTP 409 — número já usado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3001,\"agencia\":1,\"clienteId\":{{cliPjId}},\"taxaRendimento\":0.0100}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(409));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Já existe uma conta cadastrada com o número 3001.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-09 — Número de conta do seed (1001)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 409 — número 1001 já existe",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":1001,\"agencia\":1,\"clienteId\":{{cliCarlosId}},\"limiteEspecial\":0,\"taxaManutencao\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(409));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Já existe uma conta cadastrada com o número 1001.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-10 — Cliente inexistente ao abrir conta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 404 — cliente 999999 não existe",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3099,\"agencia\":1,\"clienteId\":999999,\"limiteEspecial\":0,\"taxaManutencao\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Cliente com o id 999999 não foi encontrado.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-11 — Número de conta zero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 400 — @Positive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":0,\"agencia\":1,\"clienteId\":{{cliCarlosId}},\"limiteEspecial\":0,\"taxaManutencao\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-12 — Agência negativa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 400 — @Positive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3098,\"agencia\":-1,\"clienteId\":{{cliCarlosId}},\"limiteEspecial\":0,\"taxaManutencao\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-13 — Limite especial negativo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 400 — @PositiveOrZero",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3097,\"agencia\":1,\"clienteId\":{{cliCarlosId}},\"limiteEspecial\":-50,\"taxaManutencao\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-14 — Taxa de rendimento zero na poupança",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/poupanca",
+            "description": "Esperado: HTTP 400 — @Positive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":4096,\"agencia\":1,\"clienteId\":{{cliPjId}},\"taxaRendimento\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-15 — Corrente sem taxa de manutenção",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/corrente",
+            "description": "Esperado: HTTP 400 — campo obrigatório",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":3096,\"agencia\":1,\"clienteId\":{{cliCarlosId}},\"limiteEspecial\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-16 — Listar todas as contas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas",
+            "description": "Esperado: HTTP 200 — lista contém 1001 e 3001"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"contém 1001\", () => pm.expect(body.map(c => c.numero)).to.include(1001));",
+                  "pm.test(\"contém 3001\", () => pm.expect(body.map(c => c.numero)).to.include(3001));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-17 — Buscar conta 3001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3001",
+            "description": "Esperado: HTTP 200 — corrente, saldo 0"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipo\", () => pm.expect(body.tipo).to.eql(\"Conta Corrente\"));",
+                  "pm.test(\"saldo 0\", () => pm.expect(Number(body.saldo)).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-18 — Buscar conta inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/9999",
+            "description": "Esperado: HTTP 404 — não encontrada"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Conta com o número 9999 não foi encontrada.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-19 — Extrato de conta nova vazio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3001/extrato",
+            "description": "Esperado: HTTP 200 — lista vazia"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"lista vazia\", () => pm.expect(body.length).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CTA-20 — Extrato de conta inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/9999/extrato",
+            "description": "Esperado: HTTP 404 — não encontrada"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Conta com o número 9999 não foi encontrada.\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Depósitos",
+      "item": [
+        {
+          "name": "DEP-01 — Depósito 500.00 na 3001",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/depositos",
+            "description": "Esperado: HTTP 200 — saldo 500.00",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 500.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 500\", () => pm.expect(Number(body.saldo)).to.eql(500));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP-02 — Depósito mínimo (0.01) na 3001",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/depositos",
+            "description": "Esperado: HTTP 200 — saldo 500.01",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 0.01}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 500.01\", () => pm.expect(Number(body.saldo)).to.eql(500.01));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP-03 — Depósito de valor zero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/depositos",
+            "description": "Esperado: HTTP 400 — @Positive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP-04 — Depósito de valor negativo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/depositos",
+            "description": "Esperado: HTTP 400 — @Positive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": -10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP-05 — Depósito sem o campo valor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/depositos",
+            "description": "Esperado: HTTP 400 — @NotNull",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP-06 — Depósito em conta inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/9999/depositos",
+            "description": "Esperado: HTTP 404 — conta não encontrada",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Conta com o número 9999 não foi encontrada.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP-07 — Depósito 1000.00 na poupança 4001",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/depositos",
+            "description": "Esperado: HTTP 200 — saldo 1000",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 1000.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 1000\", () => pm.expect(Number(body.saldo)).to.eql(1000));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP-08 — JSON malformado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/depositos",
+            "description": "Esperado: HTTP 400 — corpo ilegível",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEP-09 — Depósito 100.00 na corrente 3003",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3003/depositos",
+            "description": "Esperado: HTTP 200 — saldo 100",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 100.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 100\", () => pm.expect(Number(body.saldo)).to.eql(100));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Saques",
+      "item": [
+        {
+          "name": "SAQ-01 — Saque 100.00 dentro do saldo (3001)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/saques",
+            "description": "Esperado: HTTP 200 — saldo 400.01",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 100.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 400.01\", () => pm.expect(Number(body.saldo)).to.eql(400.01));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SAQ-02 — Saque 700.00 usando limite especial (3001)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/saques",
+            "description": "Esperado: HTTP 200 — saldo -299.99 (limite 300)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 700.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo -299.99\", () => pm.expect(Number(body.saldo)).to.eql(-299.99));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SAQ-03 — Saque até o limite exato (0.01) na 3001",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/saques",
+            "description": "Esperado: HTTP 200 — saldo -300.00 (limite zerado)",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 0.01}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo -300\", () => pm.expect(Number(body.saldo)).to.eql(-300));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SAQ-04 — Saque acima do disponível (0.01 com limite zerado)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/saques",
+            "description": "Esperado: HTTP 422 — rejeitado; saldo continua -300.00",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 0.01}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(422));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Saldo e limite especial insuficientes para realizar a operação.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SAQ-05 — Saque 200.00 na poupança 4001",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/saques",
+            "description": "Esperado: HTTP 200 — saldo 800",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 200.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 800\", () => pm.expect(Number(body.saldo)).to.eql(800));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SAQ-06 — Saque acima do saldo na poupança (sem limite)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/saques",
+            "description": "Esperado: HTTP 422 — poupança não tem limite especial",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 900.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(422));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Saldo insuficiente para realizar a operação.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SAQ-07 — Saque de valor zero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/saques",
+            "description": "Esperado: HTTP 400 — @Positive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SAQ-08 — Saque de valor negativo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3001/saques",
+            "description": "Esperado: HTTP 400 — @Positive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": -5}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SAQ-09 — Saque em conta inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/9999/saques",
+            "description": "Esperado: HTTP 404 — conta não encontrada",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Conta com o número 9999 não foi encontrada.\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 - Taxa de manutenção",
+      "item": [
+        {
+          "name": "TAX-01 — Taxa 15 sem saldo disponível (3001 em -300, limite 300)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3001/taxa-manutencao",
+            "description": "Esperado: HTTP 422 — rejeitada; saldo não muda"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(422));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Saldo e limite especial insuficientes para realizar a operação.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TAX-02 — Cobrar taxa 10 na corrente 3003 (saldo 100)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3003/taxa-manutencao",
+            "description": "Esperado: HTTP 200 — saldo 90.00"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 90\", () => pm.expect(Number(body.saldo)).to.eql(90));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TAX-03 — Cobrar taxa em poupança",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/4001/taxa-manutencao",
+            "description": "Esperado: HTTP 400 — só corrente"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Taxa de manutenção só pode ser cobrada em conta corrente.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TAX-04 — Cobrar taxa zero (conta 3004)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3004/taxa-manutencao",
+            "description": "Esperado: HTTP 400 — taxa inválida para cobrança"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Taxa de manutenção inválida para cobrança.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TAX-05 — Cobrar taxa em conta inexistente",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/9999/taxa-manutencao",
+            "description": "Esperado: HTTP 404 — conta não encontrada"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Conta com o número 9999 não foi encontrada.\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 - Rendimento (poupança)",
+      "item": [
+        {
+          "name": "RND-01 — Aplicar rendimento 1% em 4001 (800 -> 808)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/4001/rendimentos",
+            "description": "Esperado: HTTP 200 — saldo 808.00"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 808\", () => pm.expect(Number(body.saldo)).to.eql(808));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RND-02 — Aplicar rendimento em corrente",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3001/rendimentos",
+            "description": "Esperado: HTTP 400 — só poupança"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Rendimento só pode ser aplicado em conta poupança.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RND-03 — Aplicar rendimento em poupança sem saldo positivo (4002)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/4002/rendimentos",
+            "description": "Esperado: HTTP 422 — erro de regra de negócio, NÃO 500 (ver observação)\n\nObservação: Código lança DomainException sem handler: tende a responder 500."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(422));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Não é possível aplicar rendimentos em uma conta sem saldo positivo.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RND-04 — Aplicar rendimento em conta inexistente",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/9999/rendimentos",
+            "description": "Esperado: HTTP 404 — conta não encontrada"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Conta com o número 9999 não foi encontrada.\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 - Transferências",
+      "item": [
+        {
+          "name": "TRF-01 — Transferir 300.00 de 4001 para 4003",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/transferencias",
+            "description": "Esperado: HTTP 200 — origem 508.00",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numeroDestino\": 4003, \"valor\": 300.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"origem 508\", () => pm.expect(Number(body.saldo)).to.eql(508));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRF-02 — Transferir para a própria conta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/transferencias",
+            "description": "Esperado: HTTP 400 — bloqueado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numeroDestino\": 4001, \"valor\": 10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Não é possível transferir para a própria conta.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRF-03 — Transferir para conta inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/transferencias",
+            "description": "Esperado: HTTP 404 — não encontrada; origem sem alteração",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numeroDestino\": 9999, \"valor\": 10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Conta com o número 9999 não foi encontrada.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRF-04 — Transferir acima do saldo da poupança (600 > 508)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/transferencias",
+            "description": "Esperado: HTTP 422 — rejeitada; destino 4003 não recebe",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numeroDestino\": 4003, \"valor\": 600.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(422));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Saldo insuficiente para realizar a operação.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRF-05 — Transferir valor zero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/transferencias",
+            "description": "Esperado: HTTP 400 — @Positive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numeroDestino\": 4003, \"valor\": 0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRF-06 — Corrente 3005 transfere 150 usando limite (saldo 0, limite 200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3005/transferencias",
+            "description": "Esperado: HTTP 200 — saldo -150.00",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numeroDestino\": 4003, \"valor\": 150.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo -150\", () => pm.expect(Number(body.saldo)).to.eql(-150));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRF-07 — Corrente 3005 transfere 50.01 (só restam 50 de limite)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3005/transferencias",
+            "description": "Esperado: HTTP 422 — rejeitada",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numeroDestino\": 4003, \"valor\": 50.01}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(422));",
+                  "pm.test(\"Mensagem de erro\", () => pm.expect(body && body.detail).to.eql(\"Saldo e limite especial insuficientes para realizar a operação.\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRF-08 — Corrente 3005 transfere 50 (limite exato)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/3005/transferencias",
+            "description": "Esperado: HTTP 200 — saldo -200.00",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numeroDestino\": 4003, \"valor\": 50.00}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo -200\", () => pm.expect(Number(body.saldo)).to.eql(-200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TRF-09 — Transferência sem numeroDestino",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/contas/4001/transferencias",
+            "description": "Esperado: HTTP 400 — @NotNull",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"valor\": 10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 - Consultas e extratos",
+      "item": [
+        {
+          "name": "CON-01 — Saldo final da 3001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3001",
+            "description": "Esperado: HTTP 200 — -300.00"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo -300\", () => pm.expect(Number(body.saldo)).to.eql(-300));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-02 — Saldo final da 3003",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3003",
+            "description": "Esperado: HTTP 200 — 90.00"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 90\", () => pm.expect(Number(body.saldo)).to.eql(90));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-03 — Saldo final da 4001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/4001",
+            "description": "Esperado: HTTP 200 — 508.00"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 508\", () => pm.expect(Number(body.saldo)).to.eql(508));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-04 — Saldo final da 4003",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/4003",
+            "description": "Esperado: HTTP 200 — 500.00"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo 500\", () => pm.expect(Number(body.saldo)).to.eql(500));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-05 — Saldo final da 3005",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3005",
+            "description": "Esperado: HTTP 200 — -200.00"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"saldo -200\", () => pm.expect(Number(body.saldo)).to.eql(-200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-06 — Extrato da 3001 (falhas não entram no extrato)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3001/extrato",
+            "description": "Esperado: HTTP 200 — DEPOSITO 500, DEPOSITO 0.01, SAQUE 100, SAQUE 700, SAQUE 0.01"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipos\", () => pm.expect(body.map(m => m.tipo)).to.eql([\"DEPOSITO\",\"DEPOSITO\",\"SAQUE\",\"SAQUE\",\"SAQUE\"]));",
+                  "pm.test(\"valores\", () => pm.expect(body.map(m => Number(m.valor))).to.eql([500,0.01,100,700,0.01]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-07 — Extrato da 4001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/4001/extrato",
+            "description": "Esperado: HTTP 200 — DEPOSITO 1000, SAQUE 200, RENDIMENTO 8.00, TRANSFERENCIA 300"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipos\", () => pm.expect(body.map(m => m.tipo)).to.eql([\"DEPOSITO\",\"SAQUE\",\"RENDIMENTO\",\"TRANSFERENCIA\"]));",
+                  "pm.test(\"valores\", () => pm.expect(body.map(m => Number(m.valor))).to.eql([1000,200,8,300]));",
+                  "pm.test(\"descrição da transferência\", () => pm.expect(body[3].descricao).to.eql(\"Transferência para Carlos Lima\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-08 — Extrato da 4003 (destino das transferências)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/4003/extrato",
+            "description": "Esperado: HTTP 200 — TRANSFERENCIA_RECEBIDA 300, 150, 50"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipos\", () => pm.expect(body.map(m => m.tipo)).to.eql([\"TRANSFERENCIA_RECEBIDA\",\"TRANSFERENCIA_RECEBIDA\",\"TRANSFERENCIA_RECEBIDA\"]));",
+                  "pm.test(\"valores\", () => pm.expect(body.map(m => Number(m.valor))).to.eql([300,150,50]));",
+                  "pm.test(\"descrição\", () => pm.expect(body[0].descricao).to.eql(\"Transferência recebida de Loja Exemplo LTDA\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-09 — Extrato da 3003",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3003/extrato",
+            "description": "Esperado: HTTP 200 — DEPOSITO 100, TAXA_MANUTENCAO 10"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipos\", () => pm.expect(body.map(m => m.tipo)).to.eql([\"DEPOSITO\",\"TAXA_MANUTENCAO\"]));",
+                  "pm.test(\"valores\", () => pm.expect(body.map(m => Number(m.valor))).to.eql([100,10]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CON-10 — Extrato da 3005",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3005/extrato",
+            "description": "Esperado: HTTP 200 — TRANSFERENCIA 150, 50"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"tipos\", () => pm.expect(body.map(m => m.tipo)).to.eql([\"TRANSFERENCIA\",\"TRANSFERENCIA\"]));",
+                  "pm.test(\"valores\", () => pm.expect(body.map(m => Number(m.valor))).to.eql([150,50]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 - Erros gerais",
+      "item": [
+        {
+          "name": "ERR-01 — Rota inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/rota-inexistente",
+            "description": "Esperado: HTTP 404 — não encontrada"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERR-02 — Método não permitido (DELETE em conta)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/3001",
+            "description": "Esperado: HTTP 405 — método não suportado"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 405\", () => pm.response.to.have.status(405));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(405));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERR-03 — Número de conta não numérico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/contas/abc",
+            "description": "Esperado: HTTP 400 — erro de conversão do parâmetro"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = (() => { try { return pm.response.json(); } catch (e) { return null; } })();",
+                  "pm.test(\"Status HTTP 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Erro no formato ProblemDetail\", () => pm.expect(body && body.status).to.eql(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "cliCarlosId",
+      "value": ""
+    },
+    {
+      "key": "cliPjId",
+      "value": ""
+    }
+  ]
+}
