@@ -53,6 +53,7 @@ public class ContaPoupanca extends Conta {
             );
         }
 
+        // Arredondamento único: saldo x taxa é arredondado direto para centavos.
         BigDecimal rendimento = getSaldo()
                 .multiply(taxaRendimento)
                 .setScale(
@@ -61,7 +62,7 @@ public class ContaPoupanca extends Conta {
                 );
 
         if (rendimento.signum() == 0) {
-            return;
+            return; // rendimento menor que um centavo: nada a creditar
         }
 
         creditar(
